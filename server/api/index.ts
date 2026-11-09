@@ -5,7 +5,6 @@ import createSelfGenActivity from './createSelfGenActivity';
 import deleteActivity from './deleteActivity';
 import deleteCompensation from './deleteCompensation';
 import deleteSelfGenActivity from './deleteSelfGenActivity';
-import generateAiSummary from './generateAiSummary';
 import getActivities from './getActivities';
 import getClosedLeads from './getClosedLeads';
 import getCompensation from './getCompensation';
@@ -69,7 +68,6 @@ export const endpoints = {
   deleteActivity,
   deleteCompensation,
   deleteSelfGenActivity,
-  generateAiSummary,
   getActivities,
   getClosedLeads,
   getCompensation,

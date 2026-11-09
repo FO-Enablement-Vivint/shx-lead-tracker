@@ -24,11 +24,6 @@ logged there with the table, field and message.
   edit one to add a file and remove another (including the last one); and force
   a failure to see the "Retry upload" banner.
 
-- [ ] **Lead Details → AI Summary**
-  Requires `OPENAI_API_KEY` in `.env`. The code calls model `gpt-5.4`
-  (`server/lib/openai.ts`). Confirm the key has access to that model or change
-  the model id.
-
 ## 2. Likely to behave slightly differently
 
 - [ ] **Manager Leads / Closed Leads lists — order**

@@ -42,8 +42,6 @@ npm run dev              # http://localhost:3000
 decides whether the manager-only tabs appear. If it matches nothing, the app
 shows an Access Denied screen naming the misconfiguration.
 
-Add `OPENAI_API_KEY` for the AI summary and next-action features.
-
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | Next dev server on port 3000 |
@@ -91,7 +89,6 @@ variables to set:
 | `AIRTABLE_API_KEY` | token with `data.records:read` + `data.records:write` |
 | `AIRTABLE_BASE_ID` | `apphPJFvk2oPNeJK9` |
 | `APP_USER_EMAIL` | an email in the SHX Team table |
-| `OPENAI_API_KEY` | only for the AI summary / next-action features |
 
 **Do not deploy this publicly while `APP_USER_EMAIL` is the only thing
 identifying the user.** Until auth exists, keep it behind Vercel's deployment

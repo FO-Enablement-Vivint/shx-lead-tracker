@@ -19,6 +19,5 @@ export const env = {
   isVercel,
   airtableApiKey: req('AIRTABLE_API_KEY'),
   airtableBaseId: process.env.AIRTABLE_BASE_ID,
-  openaiApiKey: process.env.OPENAI_API_KEY || process.env.ZITE_OPENAI_ACCESS_TOKEN || '',
   dataDir: process.env.DATA_DIR || (isVercel ? '/tmp/shx-data' : './data'),
 };

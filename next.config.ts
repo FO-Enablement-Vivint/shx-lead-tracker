@@ -1,9 +1,6 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // The Airtable adapter, endpoint files and OpenAI helper are server-only and
-  // must never be bundled into the browser build.
-  serverExternalPackages: ['openai'],
   // The lead loaders read this at runtime (fs), so make sure it ships with the API route.
   outputFileTracingIncludes: {
     '/api/[name]': ['./server/data/zip-centroids.json'],

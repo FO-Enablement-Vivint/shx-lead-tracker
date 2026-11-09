@@ -4,9 +4,9 @@ import { Button } from '@project/components/ui/button';
 import { Card, CardContent } from '@project/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@project/components/ui/tabs';
 import { Badge } from '@project/components/ui/badge';
-import { Plus, MessageSquare, Edit, Phone, Mail, Calendar, User, MapPin, Building, Hash, Clock, RefreshCw, FileText } from 'lucide-react';
+import { Plus, MessageSquare, Edit, Phone, Mail, Calendar, User, MapPin, Building, Hash, Clock, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import { GetLeadsOutputType, GetRepsOutputType, generateAiSummary } from '@/lib/api';
+import { GetLeadsOutputType, GetRepsOutputType } from '@/lib/api';
 import { logAuditEvent } from '../utils/auditLogger';
 import { getStatusColorWithHover } from '../utils/statusColors';
 import { formatPhone, phoneHref } from '../utils/formatters';
@@ -51,12 +51,9 @@ export default function LeadDetails({
   const [showEditForm, setShowEditForm] = useState(false);
   const [showQuickStatusChange, setShowQuickStatusChange] = useState(false);
   const [editingActivity, setEditingActivity] = useState<any>(null);
-  const [aiSummary, setAiSummary] = useState<string | null>(null);
-  const [loadingSummary, setLoadingSummary] = useState(false);
 
   useEffect(() => {
     setCurrentLead(lead);
-    setAiSummary(null);
     setActivityRefreshKey(0);
   }, [lead?.id]);
 
@@ -115,21 +112,6 @@ export default function LeadDetails({
     setEditingActivity(null);
   };
 
-  const handleGetAiSummary = async () => {
-    if (!currentLead) return;
-    setLoadingSummary(true);
-    try {
-      const result = await generateAiSummary({ leadId: currentLead.id });
-      setAiSummary(result.text);
-      toast.success('AI summary generated');
-    } catch (error) {
-      console.error('Error getting AI summary:', error);
-      toast.error('Failed to generate AI summary');
-    } finally {
-      setLoadingSummary(false);
-    }
-  };
-
   if (!currentLead) return null;
 
   const detailTabClass = 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground text-sm font-medium transition-colors';
@@ -184,13 +166,6 @@ export default function LeadDetails({
 
               {/* ── Overview ── */}
               <TabsContent value="overview" className={TAB_PANE}>
-                <OverviewAiSummary
-                  currentLead={currentLead}
-                  aiSummary={aiSummary}
-                  loadingSummary={loadingSummary}
-                  onGetSummary={handleGetAiSummary}
-                />
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Card className="border-border">
                     <CardContent className="p-4 space-y-3">
@@ -384,44 +359,5 @@ export default function LeadDetails({
       )}
 
     </>
-  );
-}
-
-/* ── AI summary card ── */
-function OverviewAiSummary({
-  currentLead,
-  aiSummary,
-  loadingSummary,
-  onGetSummary,
-}: {
-  currentLead: Lead;
-  aiSummary: string | null;
-  loadingSummary: boolean;
-  onGetSummary: () => void;
-}) {
-  if ((currentLead.totalInteractions ?? 0) < 3) return null;
-
-  return (
-    <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
-      <div className="flex items-center gap-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
-          <FileText className="h-3.5 w-3.5 text-primary" />
-        </div>
-        <span className="text-sm font-semibold">AI Summary</span>
-      </div>
-      {!aiSummary ? (
-        <Button onClick={onGetSummary} disabled={loadingSummary} variant="outline" size="sm" className="w-full">
-          {loadingSummary ? <FileText className="h-3.5 w-3.5 mr-1.5 animate-pulse" /> : <FileText className="h-3.5 w-3.5 mr-1.5" />}
-          {loadingSummary ? 'Generating…' : 'Generate Summary'}
-        </Button>
-      ) : (
-        <div className="space-y-2">
-          <p className="text-sm whitespace-pre-wrap leading-relaxed">{aiSummary}</p>
-          <Button onClick={onGetSummary} disabled={loadingSummary} variant="ghost" size="sm" className="w-full text-xs">
-            <RefreshCw className="h-3 w-3 mr-1.5" /> Regenerate
-          </Button>
-        </div>
-      )}
-    </div>
   );
 }
