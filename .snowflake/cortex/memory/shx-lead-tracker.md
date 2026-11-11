@@ -14,5 +14,4 @@
 
 ## Next Session
 - After the deploy, smoke-test as a **Pro** in a private window (Magistrate has no logout): change a status, add a note, log an activity, edit an activity credited to another rep; confirm Manager can still reassign.
-- Remaining low-priority: `logAuditEvent` does not check the caller can access `leadId` (id only lands in free text); `VERIFICATION.md` §5 still names a `getLeadCount` endpoint that does not exist.
-- Clean up `CONTEXT.md`/`DESIGN.md` "known" lists as items get fixed (`proId` ambiguity, stale `'CLOSED | Sold'` literal, `--header-muted` mismatch, dead CSS).
+- Still open on the `CONTEXT.md`/`DESIGN.md` "known" lists: `proId` ambiguity (getReps returns the Rep ID formula as `proId`), `--header-muted` Pro vs Manager mismatch, `.dark` with no ThemeProvider, `window.confirm` on Admin, several reds with no danger token, Inter loaded from the Pro `@import`. Each needs a product/design call or a browser test.
