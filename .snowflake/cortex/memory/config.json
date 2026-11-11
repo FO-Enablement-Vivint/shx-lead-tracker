@@ -1,0 +1,28 @@
+{
+  "projectName": "shx-lead-tracker",
+  "configVersion": "1.1.0",
+  "memoryFile": ".snowflake/cortex/memory/shx-lead-tracker.md",
+  "memoryReadme": ".snowflake/cortex/memory/README.md",
+  "budgetLines": 80,
+  "ownershipDoc": "docs/KNOWLEDGE_MAP.md",
+  "canonicalDocs": [
+    { "path": "AGENTS.md", "owns": "commands, conventions, architecture pointers, gotchas" },
+    { "path": "README.md", "owns": "app overview, access model, deploy/env setup, Airtable layer" },
+    { "path": "MIGRATION.md", "owns": "Zite-to-standalone and Vite-to-Next.js migration history, auth seam" },
+    { "path": "VERIFICATION.md", "owns": "post-migration verification checklist" },
+    { "path": "docs/KNOWLEDGE_MAP.md", "owns": "doc ownership routing" },
+    { "path": "CONTEXT.md", "owns": "domain vocabulary, glossary, ADR-lite decisions", "kind": "vocabulary" },
+    { "path": "DESIGN.md", "owns": "design tokens, component conventions, interaction rules, design decisions", "kind": "design" }
+  ],
+  "planSources": [".snowflake/cortex/plans/*.plan.md"],
+  "qualityGate": [
+    "npm run typecheck",
+    "npm run build",
+    "node ~/.snowflake/cortex/plugins/project-context-kit/scripts/check-semantic-registry.mjs ."
+  ],
+  "semanticRegistry": ".snowflake/cortex/memory/semantic-registry.json",
+  "patternPromotionTarget": "AGENTS.md",
+  "neverStage": [".env", ".env.*", ".npmrc", ".vercel/", "node_modules/", ".next/", "*.tsbuildinfo", "next-env.d.ts", ".tmp/"],
+  "releaseNotesFile": null,
+  "commitFooter": "Generated with [Cortex Code](https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code)\n\nCo-Authored-By: Cortex Code <noreply@snowflake.com>"
+}
