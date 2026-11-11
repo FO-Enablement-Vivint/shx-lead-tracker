@@ -27,6 +27,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Compare roles only through `server/lib/roles.ts` (`isManagerRole`/`isProRole`, or `isManager`/`isPro` in `access.ts`); never a bare `role === 'Manager'`. `proId` always means the Airtable record id; the Rep ID formula is `repId`.
 - Show an Airtable date field with `formatDate` (`src/utils/formatters.ts`), never `new Date(value).toLocaleDateString()`: a date-only `YYYY-MM-DD` parses as UTC midnight and displays a day early in the US. Timestamps (Exports `createdTime`, Self-Gen) are real instants and are fine either way.
 - A Pro's forms submit manager-only fields back unchanged (e.g. `assignedPro`), so an ownership check must compare against the stored value and refuse only a *new* value; comparing to the caller 403s legitimate saves. See `resolveActivityPro` and `updateLead`.
+- Don't page NIS Leads in a request just to count it: the REST API has no count and is throttled to 5 req/s (~39-53k leads is minutes). Counts over big sets come from an Airtable automation: the endpoint ticks a Control Panel checkbox, the automation counts a view and writes the result, and the page polls the cached value (see `refreshAdminStats`, `getAdminStats`).
 
 ## Architecture
 
