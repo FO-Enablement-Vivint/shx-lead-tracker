@@ -13,4 +13,5 @@
 - Pushing `main` triggers a Vercel deploy of `shx-lead-tracker.vercel.app`. `.snowflake/`, `docs/`, `CONTEXT.md`, `DESIGN.md` and `AGENTS.md` don't affect the build, but keep the build gate green before pushing.
 
 ## Next Session
-- Browser smoke-test on the deployed site. As a **Pro** (private window; Magistrate has no logout): change a status, add a note, log an activity, edit an activity credited to another rep. As a **Manager**: reassign a lead, "View as" a Pro (picker lists Pros, not you; that Pro's own activities are now editable), and eyeball Admin/Team/Unassigned (red buttons, font).
+- Browser-verified on the live deploy (Manager session, read-only): Lead Tracker, Manager View Team/Unassigned/Admin render with Inter and the new reds; `getReps` returns `repId` and no `proId`. **Still unverified:** any Pro-identity save (needs a Pro Okta login; `npm run authz:saves` covers the logic offline), the View-as dropdown contents, and Admin's "Recalculate counts" (38,982 unassigned leads at 5 req/s vs Vercel's function timeout; a live write, so not clicked).
+- The browser tool inherits the user's Magistrate session; it can drive the Manager side but cannot sign in as a Pro.
