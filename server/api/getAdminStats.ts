@@ -10,6 +10,7 @@ export default createEndpoint({
     unassignedCount: z.number(),
     rawIntakeCount: z.number(),
     isCached: z.boolean(),
+    refreshing: z.boolean(),
   }),
   execute: async () => {
     const panel = await ControlPanel.findOne({});
@@ -17,6 +18,7 @@ export default createEndpoint({
       unassignedCount: panel?.unassignedLeadsCount ?? 0,
       rawIntakeCount: panel?.rawIntakeCount ?? 0,
       isCached: true,
+      refreshing: panel?.refreshCounts === true,
     };
   },
 });

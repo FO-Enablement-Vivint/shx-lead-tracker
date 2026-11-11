@@ -554,6 +554,8 @@ export interface ControlPanelRecordType {
   processNewUploads?: boolean;
   /** Mark Lead Leftovers (checkbox) */
   markLeadLeftovers?: boolean;
+  /** Refresh Counts (checkbox) */
+  refreshCounts?: boolean;
   /** Unassigned Leads Count (number) */
   unassignedLeadsCount?: number;
   /** Raw Intake Count (number) */
@@ -570,6 +572,7 @@ export const ControlPanelTable: TableDef = {
     { name: "Run Nearby Search", key: "runNearbySearch", type: "checkbox", multiValue: false, computed: false },
     { name: "Process New Uploads", key: "processNewUploads", type: "checkbox", multiValue: false, computed: false },
     { name: "Mark Lead Leftovers", key: "markLeadLeftovers", type: "checkbox", multiValue: false, computed: false },
+    { name: "Refresh Counts", key: "refreshCounts", type: "checkbox", multiValue: false, computed: false },
     { name: "Unassigned Leads Count", key: "unassignedLeadsCount", type: "number", multiValue: false, computed: false },
     { name: "Raw Intake Count", key: "rawIntakeCount", type: "number", multiValue: false, computed: false },
   ],

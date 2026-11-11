@@ -49,7 +49,7 @@ listed so new code can pick the canonical one.
 | Distribute Leads | Manager View button that ticks Run Distribution on the Control Panel to start an Airtable automation; the app assigns nothing itself. | |
 | Process New Uploads | Same pattern for turning raw intake into leads (UI text calls it the "New Lead Intake automation"). | |
 | Leftover leads | Leads still unassigned after distribution, flagged by the Mark Leftover Leads automation. | |
-| Control Panel | Single-row Airtable table of automation trigger checkboxes and cached counts. | |
+| Control Panel | Single-row Airtable table of automation trigger checkboxes and cached counts. Refresh Counts triggers the Refresh Admin Counts automation, which rewrites the two count fields. | |
 | Audit Log | Airtable table of manager actions that also carries each action's undo data (see Decisions). | |
 
 ### Pro-facing records

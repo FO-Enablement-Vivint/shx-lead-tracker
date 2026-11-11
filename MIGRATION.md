@@ -34,9 +34,9 @@ Files moved out of `src/` because they only run on the server:
   writes to button fields, so if these actions error, the fix is to point the
   automation trigger at a checkbox field and update the two endpoints.
 - **Record order.** Queries run without a view, so Airtable returns records in
-  the table's default order. `refreshAdminStats` assumes the first page of NIS
-  Leads is newest-first when counting raw intake. If that count looks wrong,
-  add `sort: [{ field: 'dateAdded', direction: 'desc' }]` to that query.
+  the table's default order. Nothing relies on that order for counts anymore:
+  `refreshAdminStats` ticks Refresh Counts and the Airtable automation counts
+  the `Unassigned Leads` and `_SYSTEM_RAW_INTAKE` views.
 - **Attachments.** Files are uploaded straight into the record's Attachments cell
   through Airtable's upload endpoint, so nothing is hosted here. Airtable caps
   files at 5 MB and Vercel caps request bodies at 4.5 MB, so the route allows

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api, errorMessage } from '@/manage/api';
 
-type Stats = { unassignedCount?: number; rawIntakeCount?: number };
+type Stats = { unassignedCount?: number; rawIntakeCount?: number; refreshing?: boolean };
 
 // Each action ticks a checkbox on the Airtable Control Panel record, which an
 // Airtable automation watches.
@@ -43,8 +43,18 @@ export default function AdminPage() {
     setRefreshing(true);
     setError(null);
     try {
-      setStats(await api('refreshAdminStats'));
-      setNotice('Counts recalculated.');
+      await api('refreshAdminStats');
+      // The Airtable automation recounts and unticks Refresh Counts when done.
+      for (let i = 0; i < 30; i++) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const next = await api('getAdminStats');
+        setStats(next);
+        if (!next.refreshing) {
+          setNotice('Counts recalculated.');
+          return;
+        }
+      }
+      setError('Recalculation has not finished after 60 seconds. Check that the "Refresh Admin Counts" automation is turned on in Airtable.');
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -81,7 +91,7 @@ export default function AdminPage() {
       </div>
       <div className="row" style={{ marginBottom: 20 }}>
         <button onClick={refresh} disabled={refreshing}>{refreshing ? 'Recalculating…' : 'Recalculate counts'}</button>
-        <span className="muted">Counts are cached on the Control Panel record; recalculating pages through NIS Leads.</span>
+        <span className="muted">Counts are cached on the Control Panel record; recalculating asks Airtable to recount, which takes a few seconds.</span>
       </div>
 
       {ACTIONS.map(action => (

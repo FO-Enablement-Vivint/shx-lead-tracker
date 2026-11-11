@@ -77,14 +77,15 @@ logged there with the table, field and message.
 
 ## 5. Still to decide before production (Vercel)
 
-- Vercel function timeouts: `refreshAdminStats` pages through every "Ready to
-  Assign" lead at 5 req/s, and no route sets `maxDuration`, so it can exceed a
-  Vercel function timeout when that queue is large (not measured). `getAdminStats`
-  reads the cached Control Panel counts, so only the refresh is at risk. The
-  old `getLeadStats` had the same problem (a manager-view call ran past 7
-  minutes locally, 2026-09-29) and was deleted on 2026-11-11 because nothing
-  called it. Read counts from Airtable rollups/Control Panel or precompute on a
-  cron.
+- Turn on and test the Airtable automation "Refresh Admin Counts"
+  (`wflJUtakpR1SeJVEc`): it fires when Refresh Counts on the Control Panel
+  record is ticked, counts the `Unassigned Leads` and `_SYSTEM_RAW_INTAKE`
+  views, writes both counts, and unticks the box. `refreshAdminStats` only
+  ticks the box and the Admin page polls `getAdminStats` (up to 60s). Without
+  the automation on, Recalculate counts reports a timeout. This replaced paging
+  ~39-53k leads through the REST API (~400-530 requests at 5 req/s, no
+  `maxDuration`, unmeasured). The old `getLeadStats` had the same problem and
+  was deleted on 2026-11-11.
 - Import old `LoginEvents` rows into Neon if Zite can still export them.
 
 See also `MIGRATION.md` (what replaced what) and `README.md` (running and
