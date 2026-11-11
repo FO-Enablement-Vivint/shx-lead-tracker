@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { Activities, NisLeads } from '../airtable/index';
+import { isManager, ownsLead } from '../lib/access';
+import { ApiError } from '../lib/endpoint';
 
 export default createEndpoint({
   description: 'Retrieves activities for a specific lead from the Activities table',
@@ -11,9 +13,13 @@ export default createEndpoint({
     offset: z.string().optional(),
   }),
   outputSchema: z.any(),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
     // Fetch the lead to get its linked activity IDs from notesInteractions
     const lead = await NisLeads.findOne({ id: input.leadId });
+
+    if (!isManager(context.user) && (!lead || !ownsLead(context.user, lead))) {
+      throw new ApiError({ code: 'FORBIDDEN', message: 'That lead is not assigned to you.' });
+    }
 
     const activityIds = lead?.notesInteractions;
 

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { NisLeads } from '../airtable/index';
+import { resolveAssignedPro } from '../lib/access';
 
 // Paginate through all records matching filters and return the count.
 // Each call runs as an independent async stream — callers run these in parallel.
@@ -27,9 +28,11 @@ export default createEndpoint({
     assignedPro: z.string().optional(),
   }),
   outputSchema: z.any(),
-  execute: async ({ input }) => {
-    const repFilter = input.assignedPro
-      ? { assignedPro: { contains: input.assignedPro } }
+  execute: async ({ input, context }) => {
+    // A Pro may only ask for their own stats; only a Manager may pass another id or none.
+    const assignedPro = resolveAssignedPro(context.user, input.assignedPro);
+    const repFilter = assignedPro
+      ? { assignedPro: { contains: assignedPro } }
       : {};
 
     const [
@@ -47,7 +50,7 @@ export default createEndpoint({
       paginateCount({ ...repFilter, status: { contains: 'CLOSED' } }),
       paginateCount({ ...repFilter, status: 'CLOSED | Sold/Scheduled' }),
       paginateCount({ ...repFilter, status: 'CLOSED | Installed' }),
-      input.assignedPro
+      assignedPro
         ? Promise.resolve(0)
         : paginateCount({ leadType: 'Ready to Assign' }),
     ]);

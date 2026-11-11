@@ -4,6 +4,7 @@ import { createEndpoint } from '../lib/endpoint';
 import { NisLeads, ShxTeam } from '../airtable/index';
 import type { NisLeadsRecordType } from '../airtable/index';
 import { passesSearch, mapLead, leadSearchAny } from '../utils/leadUtils';
+import { resolveAssignedPro } from '../lib/access';
 
 export default createEndpoint({
   description: `Returns CLOSED leads only. Uses context.user.assignedLeads directly when the
@@ -21,6 +22,8 @@ export default createEndpoint({
   outputSchema: z.any(),
   execute: async ({ input, context }) => {
     await enrichCurrentUser(context);
+    // A Pro may only ask for their own leads; only a Manager may pass another id or none.
+    const assignedPro = resolveAssignedPro(context.user, input.assignedPro);
     const limit = input.limit || 50;
 
     const matchesStatus = (record: NisLeadsRecordType): boolean => {
@@ -33,14 +36,14 @@ export default createEndpoint({
     // ─────────────────────────────────────────────────────────────────────────
     // PRO VIEW — fetch ALL assigned lead chunks in PARALLEL, then paginate
     // ─────────────────────────────────────────────────────────────────────────
-    if (input.assignedPro) {
+    if (assignedPro) {
       let allAssignedIds: string[];
 
-      if (input.assignedPro === context.user.id) {
+      if (assignedPro === context.user.id) {
         const raw = context.user.assignedLeads1;
         allAssignedIds = Array.isArray(raw) ? (raw as string[]) : raw ? [raw as string] : [];
       } else {
-        const repRecord = await ShxTeam.findOne({ id: input.assignedPro });
+        const repRecord = await ShxTeam.findOne({ id: assignedPro });
         const raw = repRecord?.assignedLeads1;
         allAssignedIds = Array.isArray(raw) ? (raw as string[]) : raw ? [raw as string] : [];
       }

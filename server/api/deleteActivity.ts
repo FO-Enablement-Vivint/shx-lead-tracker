@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { Activities } from '../airtable/index';
+import { requireActivityAccess } from '../lib/access';
 
 export default createEndpoint({
   description: 'Deletes an activity record from the Activities table',
@@ -9,7 +10,8 @@ export default createEndpoint({
     activityId: z.string(),
   }),
   outputSchema: z.any(),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireActivityAccess(context.user, input.activityId);
     await Activities.delete({ id: input.activityId });
     return { id: input.activityId, success: true };
   },

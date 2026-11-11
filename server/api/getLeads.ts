@@ -4,6 +4,7 @@ import { createEndpoint } from '../lib/endpoint';
 import { NisLeads, ShxTeam } from '../airtable/index';
 import type { NisLeadsRecordType } from '../airtable/index';
 import { passesSearch, mapLead, leadSearchAny } from '../utils/leadUtils';
+import { resolveAssignedPro } from '../lib/access';
 
 export default createEndpoint({
   description: `Returns ACTIVE leads only (NEW + IN-PROGRESS — never CLOSED).
@@ -27,6 +28,8 @@ export default createEndpoint({
   outputSchema: z.any(),
   execute: async ({ input, context }) => {
     await enrichCurrentUser(context);
+    // A Pro may only ask for their own leads; only a Manager may pass another id or none.
+    const assignedPro = resolveAssignedPro(context.user, input.assignedPro);
     const ACTIVE_BUCKETS = ['NEW', 'IN-PROGRESS'];
     const statusBucket = input.status && ACTIVE_BUCKETS.includes(input.status) ? input.status : undefined;
     const exactStatus = input.status && !ACTIVE_BUCKETS.includes(input.status) ? input.status : undefined;
@@ -43,17 +46,17 @@ export default createEndpoint({
     // ─────────────────────────────────────────────────────────────────────────
     // PRO VIEW — fetch all assigned lead chunks in PARALLEL (not sequential)
     // ─────────────────────────────────────────────────────────────────────────
-    if (input.assignedPro) {
+    if (assignedPro) {
       let allAssignedIds: string[];
 
-      if (input.assignedPro === context.user.id) {
+      if (assignedPro === context.user.id) {
         // User is viewing their own leads — use the synced context directly,
         // no extra API call to ShxTeam needed
         const raw = context.user.assignedLeads1;
         allAssignedIds = Array.isArray(raw) ? (raw as string[]) : raw ? [raw as string] : [];
       } else {
         // Manager proxying as a different Pro — must fetch their record
-        const repRecord = await ShxTeam.findOne({ id: input.assignedPro });
+        const repRecord = await ShxTeam.findOne({ id: assignedPro });
         const raw = repRecord?.assignedLeads1;
         allAssignedIds = Array.isArray(raw) ? (raw as string[]) : raw ? [raw as string] : [];
       }

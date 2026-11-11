@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { Activities } from '../airtable/index';
+import { requireActivityAccess, resolveActivityPro } from '../lib/access';
 
 export default createEndpoint({
   description: 'Updates an existing activity record in the Activities table',
@@ -14,14 +15,17 @@ export default createEndpoint({
     followUpDate: z.string().optional(),
   }),
   outputSchema: z.any(),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireActivityAccess(context.user, input.activityId);
+    const assignedPro = resolveActivityPro(context.user, input.assignedPro);
+
     await Activities.update({
       id: input.activityId,
       record: {
         type: input.type,
         content: input.content,
         date: input.date,
-        assignedPro: input.assignedPro,
+        assignedPro,
         followUpDate: input.followUpDate,
       },
     });

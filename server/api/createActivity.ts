@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { Activities } from '../airtable/index';
+import { requireLeadAccess, resolveActivityPro } from '../lib/access';
 
 export default createEndpoint({
   description: 'Creates a new activity record in the Activities table',
@@ -14,7 +15,10 @@ export default createEndpoint({
     followUpDate: z.string().optional(),
   }),
   outputSchema: z.any(),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireLeadAccess(context.user, input.relatedLead);
+    const assignedPro = resolveActivityPro(context.user, input.assignedPro);
+
     const createActivityRecord = await Activities.create({
       record: {
         type: input.type,
@@ -22,7 +26,7 @@ export default createEndpoint({
         content: input.content,
         relatedLead: [input.relatedLead],
         date: input.date,
-        assignedPro: input.assignedPro,
+        assignedPro,
       },
     });
 
