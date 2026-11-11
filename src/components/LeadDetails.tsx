@@ -27,7 +27,6 @@ interface LeadDetailsProps {
   currentUser: {
     id: string;
     email: string;
-    proId?: string;
     proName: string;
     displayName: string;
     role: string;

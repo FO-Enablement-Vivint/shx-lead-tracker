@@ -5,6 +5,7 @@ import { api, errorMessage, type OutputOf } from '@/manage/api';
 import { Spinner } from '@/manage/ManageLoading';
 import { useCardMode } from '@/manage/useCardMode';
 import { formatDate } from '@/manage/format';
+import { isProRole } from '@server/lib/roles';
 
 type Lead = OutputOf<'getUnassignedLeads'>['leads'][number];
 type Rep = { id: string; name: string };
@@ -32,7 +33,7 @@ export default function UnassignedPage() {
       .then(res =>
         setReps(
           (res.pros as any[])
-            .filter(p => p.role === 'Pro')
+            .filter(p => isProRole(p.role))
             .map(p => ({ id: p.id, name: p.displayName || p.proName || p.email }))
             .sort((a, b) => a.name.localeCompare(b.name)),
         ),

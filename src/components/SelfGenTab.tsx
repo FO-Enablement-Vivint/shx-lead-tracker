@@ -10,6 +10,7 @@ import SelfGenTable from './selfgen/SelfGenTable';
 import SelfGenEditDialog from './selfgen/SelfGenEditDialog';
 import SelfGenViewDialog from './selfgen/SelfGenViewDialog';
 import type { SelfGenActivity } from './selfgen/types';
+import { isManagerRole } from '@server/lib/roles';
 
 interface SelfGenTabProps {
   isManager: boolean;
@@ -100,8 +101,8 @@ export default function SelfGenTab({ isManager }: SelfGenTabProps) {
                   <SelectItem value="all">All</SelectItem>
                   <SelectSeparator />
                   {(() => {
-                    const managers = pros.filter(p => p.role === 'Manager');
-                    const reps = pros.filter(p => p.role !== 'Manager');
+                    const managers = pros.filter(p => isManagerRole(p.role));
+                    const reps = pros.filter(p => !isManagerRole(p.role));
                     return (
                       <>
                         {managers.length > 0 && (

@@ -2,6 +2,7 @@ import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { SelfGenTime, ShxTeam } from '../airtable/index';
+import { isManager } from '../lib/access';
 
 /** Parses "8:00 am - 8:30 am" style time slots into minutes-since-midnight for sorting. */
 function parseSlotMinutes(slot?: string): number {
@@ -28,11 +29,11 @@ export default createEndpoint({
   outputSchema: z.any(),
   execute: async ({ input, context }) => {
     await enrichCurrentUser(context);
-    const isManager = context.user.role === 'Manager';
+    const manager = isManager(context.user);
     const limit = input.limit || 100;
 
     // Determine which pro's activities to fetch
-    const targetProId = isManager ? input.proId : context.user.id;
+    const targetProId = manager ? input.proId : context.user.id;
 
     const filters: Record<string, any> = {};
     if (targetProId) {

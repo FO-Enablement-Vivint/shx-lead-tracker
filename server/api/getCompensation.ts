@@ -2,6 +2,7 @@ import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { Exports } from '../airtable/index';
+import { isManager as isManagerUser } from '../lib/access';
 
 export default createEndpoint({
   description: 'Gets compensation records from the Exports table based on user role and permissions. Uses context.user directly — no redundant user lookup.',
@@ -14,7 +15,7 @@ export default createEndpoint({
   outputSchema: z.any(),
   execute: async ({ input, context }) => {
     await enrichCurrentUser(context);
-    const isManager = context.user.role === 'Manager';
+    const isManager = isManagerUser(context.user);
     const limit = input.limit || 50;
 
     // Pros can only see their own records; managers see all or filter by repId

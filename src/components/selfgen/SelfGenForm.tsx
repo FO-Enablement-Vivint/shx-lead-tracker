@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { createSelfGenActivity } from '@/lib/api';
 import { uploadFiles, checkUploadSize, type PendingFile } from '@/lib/upload';
 import { TIME_SLOTS, ACTIVITY_TYPES } from './constants';
+import { isManagerRole } from '@server/lib/roles';
 
 interface Pro {
   id: string;
@@ -180,8 +181,8 @@ export default function SelfGenForm({ onCreated, pros }: SelfGenFormProps) {
                     </SelectTrigger>
                     <SelectContent>
                       {(() => {
-                        const managers = pros!.filter(p => p.role === 'Manager');
-                        const reps = pros!.filter(p => p.role !== 'Manager');
+                        const managers = pros!.filter(p => isManagerRole(p.role));
+                        const reps = pros!.filter(p => !isManagerRole(p.role));
                         return (
                           <>
                             {managers.length > 0 && (

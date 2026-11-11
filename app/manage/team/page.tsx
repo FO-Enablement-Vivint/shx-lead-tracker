@@ -8,6 +8,7 @@ import LoadLeadsDialog, { type LoadMode } from '@/manage/LoadLeadsDialog';
 import ReclaimLeadsDialog, { type ReclaimMode } from '@/manage/ReclaimLeadsDialog';
 import RevertProDialog from '@/manage/RevertProDialog';
 import OffboardProDialog from '@/manage/OffboardProDialog';
+import { isProRole } from '@server/lib/roles';
 
 type Pro = {
   id: string;
@@ -55,7 +56,7 @@ export default function TeamPage() {
     setError(null);
     try {
       const res = await api('getReps');
-      setPros((res.pros as Pro[]).filter(p => p.role === 'Pro'));
+      setPros((res.pros as Pro[]).filter(p => isProRole(p.role)));
     } catch (err) {
       setError(errorMessage(err));
     } finally {

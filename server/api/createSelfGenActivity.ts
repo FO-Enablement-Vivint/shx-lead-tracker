@@ -2,6 +2,7 @@ import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { SelfGenTime } from '../airtable/index';
+import { isManager as isManagerUser } from '../lib/access';
 
 export default createEndpoint({
   description: 'Creates a new Self-Gen Time activity record. Managers can optionally specify a proId to log on behalf of another Pro.',
@@ -17,7 +18,7 @@ export default createEndpoint({
   execute: async ({ input, context }) => {
     await enrichCurrentUser(context);
     // Managers can specify a target Pro; non-managers always self-link
-    const isManager = context.user.role === 'Manager';
+    const isManager = isManagerUser(context.user);
     const targetProId = isManager && input.proId ? input.proId : context.user.id;
 
     const record: Record<string, any> = {

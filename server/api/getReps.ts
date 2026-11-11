@@ -59,7 +59,7 @@ export default createEndpoint({
 
     const pros = allRecords.map(record => ({
       id: record.id,
-      proId: record.repId,
+      repId: record.repId,
       proName: record.proName,
       displayName: record.displayName,
       email: record.email,

@@ -7,6 +7,7 @@ import { Skeleton } from '@project/components/ui/skeleton';
 import { MessageSquare, Phone, User, Calendar, Edit2, FileText, Trash2, RefreshCw } from 'lucide-react';
 import { getActivities, deleteActivity, GetActivitiesOutputType, GetRepsOutputType } from '@/lib/api';
 import { toast } from 'sonner';
+import { isManagerRole } from '@server/lib/roles';
 
 type Activity = GetActivitiesOutputType['activities'][0];
 type Pro = GetRepsOutputType['pros'][0];
@@ -19,7 +20,6 @@ interface ActivityListProps {
   refreshKey?: number;
   currentUser?: {
     id: string;
-    proId?: string;
     role: string;
   };
 }
@@ -99,9 +99,9 @@ export default function ActivityList({ leadId, pros, onEditActivity, onRefresh, 
   const canEditActivity = (activity: Activity) => {
     if (!currentUser) return false;
     // Managers can edit all activities
-    if (currentUser.role === 'Manager') return true;
+    if (isManagerRole(currentUser.role)) return true;
     // Individual contributors can only edit their own activities
-    return activity.assignedPro?.includes(currentUser.proId || '');
+    return activity.assignedPro?.includes(currentUser.id);
   };
 
   const handleDeleteActivity = async (activityId: string) => {

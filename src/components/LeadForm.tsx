@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { updateLead, GetLeadsOutputType, GetRepsOutputType } from '@/lib/api';
 import CloseReasonDialog from './CloseReasonDialog';
 import { useStatusOptions } from '../contexts/StatusOptionsContext';
+import { isManagerRole } from '@server/lib/roles';
 type Lead = GetLeadsOutputType['leads'][0];
 type Pro = GetRepsOutputType['pros'][0];
 interface LeadFormProps {
@@ -19,7 +20,6 @@ interface LeadFormProps {
   onLeadUpdated?: (updates: Partial<Lead>) => void;
   currentUser: {
     id: string;
-    proId?: string;
     role: string;
   };
 }
@@ -46,7 +46,7 @@ export default function LeadForm({
   const [loading, setLoading] = useState(false);
   const [showCloseReasonDialog, setShowCloseReasonDialog] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string>('');
-  const isManager = currentUser.role === 'Manager';
+  const isManager = isManagerRole(currentUser.role);
 
   // Define which fields are editable based on user role
   const fieldPermissions = {

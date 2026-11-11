@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,7 +29,13 @@
     --muted-foreground: 220 9% 40%;
     --accent: 202 95% 46%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    /* The one red. Three shades, by job: --danger for text, icons and borders on light surfaces;
+       --danger-strong for solid fills that carry white text (contrast); --danger-soft for text
+       on the Manager View's dark surfaces. Other reds point at these. */
+    --danger: 0 84% 60%;
+    --danger-strong: 0 72% 51%;
+    --danger-soft: 0 78% 68%;
+    --destructive: var(--danger);
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 82%;
     --input: 220 13% 82%;
@@ -40,11 +44,11 @@
     /* Dark header — deep forest green */
     --header-bg: 150 35% 14%;
     --header-foreground: 145 20% 95%;
-    --header-muted: 145 12% 55%;
+    --header-muted: 145 12% 62%;
     --header-border: 150 25% 22%;
     
     /* Font families */
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'Courier New', monospace;
     
     /* Border radius */
@@ -79,9 +83,9 @@
     --status-success-foreground: 0 0% 100%;
     --status-success-bg: 142 76% 36%;
     
-    --status-closed: 0 72% 51%;
+    --status-closed: var(--danger-strong);
     --status-closed-foreground: 0 0% 100%;
-    --status-closed-bg: 0 72% 51%;
+    --status-closed-bg: var(--danger-strong);
     
     --status-default: 215 16% 47%;
     --status-default-foreground: 0 0% 100%;
@@ -90,38 +94,6 @@
     /* Warning colors (amber) */
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --warning-bg: 38 92% 95%;
-    --warning-border: 38 92% 75%;
-    --warning-text: 38 80% 30%;
-  }
-
-  .dark {
-    /* Match light theme so the auth pages look consistent */
-    --background: 220 14% 94%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 145 50% 38%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 24 95% 53%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 220 14% 89%;
-    --muted-foreground: 220 9% 40%;
-    --accent: 202 95% 46%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 82%;
-    --input: 220 13% 82%;
-    --ring: 145 50% 38%;
-    
-    --header-bg: 150 35% 14%;
-    --header-foreground: 145 20% 95%;
-    --header-muted: 145 12% 55%;
-    --header-border: 150 25% 22%;
-    
     --warning-bg: 38 92% 95%;
     --warning-border: 38 92% 75%;
     --warning-text: 38 80% 30%;

@@ -14,9 +14,14 @@
  */
 import { Activities, NisLeads, SelfGenTime } from '../airtable/index';
 import { ApiError, type RequestUser } from './endpoint';
+import { isManagerRole, isProRole } from './roles';
 
 export function isManager(user: RequestUser): boolean {
-  return user.role === 'Manager';
+  return isManagerRole(user.role);
+}
+
+export function isPro(user: RequestUser): boolean {
+  return isProRole(user.role);
 }
 
 /** Throws FORBIDDEN (HTTP 403) unless the caller is a manager. Fails closed. */

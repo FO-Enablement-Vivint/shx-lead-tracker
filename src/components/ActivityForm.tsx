@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { createActivity, updateActivity, GetRepsOutputType } from '@/lib/api';
 import { logAuditEvent } from '../utils/auditLogger';
+import { isManagerRole } from '@server/lib/roles';
 
 type Pro = GetRepsOutputType['pros'][0];
 
@@ -19,7 +20,6 @@ interface ActivityFormProps {
   currentUser: {
     id: string;
     email: string;
-    proId?: string;
     proName: string;
     displayName: string;
     role: string;
@@ -165,7 +165,7 @@ export default function ActivityForm({ leadId, pros, onClose, onActivityCreated,
           )}
 
           {/* Assigned Rep - Only show for Managers */}
-          {currentUser?.role === 'Manager' && (
+          {isManagerRole(currentUser?.role) && (
             <div className="space-y-2">
               <Label htmlFor="assignedPro">Pro (Optional)</Label>
               <Select value={formData.assignedPro} onValueChange={(value) => handleInputChange('assignedPro', value)}>

@@ -9,6 +9,7 @@ import { ProxyProvider } from './contexts/ProxyContext';
 import { StatusOptionsProvider } from './contexts/StatusOptionsContext';
 import { RepsProvider } from './contexts/RepsContext';
 import { SessionProvider } from '@FO-Enablement-Vivint/magistrate/next';
+import { isManagerRole } from '@server/lib/roles';
 
 type Profile = NonNullable<GetMyProfileOutputType['profile']>;
 
@@ -72,7 +73,6 @@ export default function App() {
     return {
       id: profile.id,
       email: profile.email,
-      proId: profile.id,
       proName: profile.proName,
       displayName: profile.displayName,
       role: profile.role,
@@ -149,7 +149,7 @@ export default function App() {
   return (
     <>
       <ProxyProvider user={authenticatedUser}>
-        <RepsProvider autoLoad={authenticatedUser.role === 'Manager'}>
+        <RepsProvider autoLoad={isManagerRole(authenticatedUser.role)}>
           <StatusOptionsProvider>
             <LeadsDashboard />
           </StatusOptionsProvider>

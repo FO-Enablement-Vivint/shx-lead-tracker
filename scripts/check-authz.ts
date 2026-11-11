@@ -11,6 +11,7 @@ import 'dotenv/config';
 import { ShxTeam, NisLeads, Activities, SelfGenTime } from '../server/airtable/index';
 import { requireRosterUser } from '../server/lib/roster';
 import { ApiError, type RequestUser } from '../server/lib/endpoint';
+import { isManagerRole, isProRole } from '../server/lib/roles';
 import { requireLeadAccess, requireActivityAccess, requireSelfGenAccess, resolveActivityPro } from '../server/lib/access';
 import getLeads from '../server/api/getLeads';
 import getClosedLeads from '../server/api/getClosedLeads';
@@ -39,9 +40,9 @@ async function userFor(email: string): Promise<RequestUser> {
 
 async function main() {
   const team = await ShxTeam.findAll({ filters: { status: 'Active' }, limit: 100 });
-  const manager = team.records.find((r) => r.role === 'Manager' && r.email);
+  const manager = team.records.find((r) => isManagerRole(r.role) && r.email);
   const pros = team.records.filter(
-    (r) => r.role !== 'Manager' && r.email && Array.isArray(r.assignedLeads1) && r.assignedLeads1.length > 0,
+    (r) => isProRole(r.role) && r.email && Array.isArray(r.assignedLeads1) && r.assignedLeads1.length > 0,
   );
   if (!manager || pros.length < 2) {
     console.error('Need one active Manager and two active Pros with leads in the SHX Team table.');

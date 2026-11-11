@@ -13,6 +13,7 @@
 import { NisLeads, ShxTeam, AuditLog } from '../airtable/index';
 import { airtableString as q } from '../lib/airtable';
 import { ApiError } from '../lib/endpoint';
+import { isProRole } from '../lib/roles';
 import {
   BUCKET_LABELS, BUCKET_ORDER, DEFAULT_DAILY_CAP, DEFAULT_TOTAL_CAP, MAX_LEAD_AGE_DAYS, STATE_NAME_BY_ABBR,
   bucketize, filterCandidates, shortfallReasons, territoryOf, type BucketName, type LeadFields,
@@ -114,7 +115,7 @@ export async function loadLeadsForPro(o: LoadOptions): Promise<LoadResult> {
   const proInfo = { id: pro.id, name: String(p.displayName || p.proName || p.repId) };
 
   // 1. Eligibility (same rule as the script)
-  if (p.role !== 'Pro' || p.status !== 'Active' || p.skipLoadLeads) {
+  if (!isProRole(p.role) || p.status !== 'Active' || p.skipLoadLeads) {
     return { status: 'skipped', pro: proInfo, message: `Not eligible: Role ${p.role ?? '—'}, Status ${p.status ?? '—'}${p.skipLoadLeads ? ', Skip Load Leads is checked' : ''}.` };
   }
 

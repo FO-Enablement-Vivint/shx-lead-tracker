@@ -4,6 +4,7 @@ import { Eye } from 'lucide-react';
 import { GetRepsOutputType } from '@/lib/api';
 import { useProxy } from '../contexts/ProxyContext';
 import { useReps } from '../contexts/RepsContext';
+import { isManagerRole } from '@server/lib/roles';
 
 type Pro = GetRepsOutputType['pros'][0];
 
@@ -18,20 +19,19 @@ export default function ProxySelector({ isManager, darkHeader, variant = 'defaul
   const { originalUser, currentUser, isProxying, setProxy, clearProxy } = useProxy();
   const { pros: allPros, loading } = useReps();
 
-  const pros = allPros.filter(pro => pro.role !== 'Manager' && pro.proId !== originalUser?.proId);
+  const pros = allPros.filter(pro => !isManagerRole(pro.role) && pro.id !== originalUser?.id);
 
   if (!isManager) return null;
 
-  const handleProxyChange = (proId: string) => {
-    if (proId === 'none') {
+  const handleProxyChange = (selectedId: string) => {
+    if (selectedId === 'none') {
       clearProxy();
     } else {
-      const selectedPro = pros.find(pro => pro.proId === proId);
+      const selectedPro = pros.find(pro => pro.id === selectedId);
       if (selectedPro) {
         setProxy({
           id: selectedPro.id,
           email: selectedPro.email || '',
-          proId: selectedPro.proId || '',
           proName: selectedPro.proName || '',
           displayName: selectedPro.displayName || '',
           role: selectedPro.role || '',
@@ -44,7 +44,7 @@ export default function ProxySelector({ isManager, darkHeader, variant = 'defaul
 
   return (
     <Select
-      value={isProxying ? currentUser?.proId || '' : 'none'}
+      value={isProxying ? currentUser?.id || '' : 'none'}
       onValueChange={handleProxyChange}
       disabled={loading}
     >
@@ -62,7 +62,7 @@ export default function ProxySelector({ isManager, darkHeader, variant = 'defaul
           <span className="font-medium">My View</span>
         </SelectItem>
         {pros.map(pro => (
-          <SelectItem key={pro.proId} value={pro.proId || pro.id}>
+          <SelectItem key={pro.id} value={pro.id}>
             {pro.displayName || pro.proName}
           </SelectItem>
         ))}

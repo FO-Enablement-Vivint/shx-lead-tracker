@@ -2,6 +2,8 @@ import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { ShxTeam } from '../airtable/index';
+import { isManager as isManagerUser } from '../lib/access';
+import { isManagerRole } from '../lib/roles';
 
 export default createEndpoint({
   description: 'Gets running compensation totals for SHX reps based on user permissions. Uses context.user directly — no redundant user lookup.',
@@ -12,12 +14,12 @@ export default createEndpoint({
   outputSchema: z.any(),
   execute: async ({ input, context }) => {
     await enrichCurrentUser(context);
-    const isManager = context.user.role === 'Manager';
+    const isManager = isManagerUser(context.user);
     const hasSpecificRepIds = Boolean(input.repIds && input.repIds.length > 0);
 
     const formatTotals = (records: Awaited<ReturnType<typeof ShxTeam.findAll>>['records']) => {
       const totals = records
-        .filter(rep => rep.role !== 'Manager')
+        .filter(rep => !isManagerRole(rep.role))
         .map(rep => ({
           repId: rep.id,
           repName: rep.proName || rep.displayName || 'Unknown',

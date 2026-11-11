@@ -2,6 +2,7 @@ import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { ApiError, createEndpoint } from '../lib/endpoint';
 import { SelfGenTime } from '../airtable/index';
+import { isManager } from '../lib/access';
 
 export default createEndpoint({
   description: 'Deletes a Self-Gen Time activity record. Restricted to Manager-role users.',
@@ -15,7 +16,7 @@ export default createEndpoint({
   }),
   execute: async ({ input, context }) => {
     await enrichCurrentUser(context);
-    if (context.user.role !== 'Manager') {
+    if (!isManager(context.user)) {
       throw new ApiError({ code: 'FORBIDDEN', message: 'Only managers can delete Self-Gen activities' });
     }
 

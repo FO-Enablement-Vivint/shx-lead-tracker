@@ -64,17 +64,20 @@ listed so new code can pick the canonical one.
 
 ## Known vocabulary inconsistencies
 
-Recorded so they are not mistaken for distinct concepts. None are fixed yet.
+Recorded so they are not mistaken for distinct concepts. Those not listed were fixed (see Decisions).
 
 - **Pro / Rep / User / SHX** all mean a roster member. The Exports and Self-Gen tables say "SHX Name", "SHX Email" and "SHX Pro"; the compensation UI says "All Users", "All Pros" and "Selected Rep".
-- **`proId` is two different ids.** Mutating endpoints take the Airtable record id, but `getReps` returns the Rep ID formula value as `proId`.
 - **"Active" means three things:** Lead Type `Active`, roster Status `Active`, and the Leads tab (NEW + IN-PROGRESS only).
 - **"Closed" means two things:** Lead Type `Closed` and a Status starting `CLOSED |`. (A third, the "closed" stat that excluded sold leads, lived only in `getLeadStats` and went when it was deleted.)
-- **Role checks are written two ways:** `role === 'Pro'` and `role !== 'Manager'`. A third role would be treated differently by each.
 - **Compensation vs Exports:** the UI says Compensation, the Airtable table is Exports.
 - **Activities has several names:** Activities, Notes/Interactions, Lead Interactions, # Interactions.
 
 ## Decisions
+
+### Role strings live in one module, and `proId` means the Airtable record id — 2026-11-11
+- **Context:** Role checks were written four ways (`=== 'Manager'`, `!== 'Manager'`, `=== 'Pro'`, `!== 'Pro'`), so a third role would be treated differently by each. Separately, `getReps` returned the Rep ID formula as `proId` while every write takes the Airtable record id, and the proxy ("view as") user carried that Rep ID, so its own-activity check (`assignedPro.includes(proId)`) could never match.
+- **Decision:** `server/lib/roles.ts` (`isManagerRole`, `isProRole`) is the only place a role string is compared; the server wraps it as `isManager`/`isPro` in `access.ts`. Gates use `isManager` and fail closed; "carries a lead book" lists use `isPro`; "everyone but managers" groupings use `!isManagerRole`. `getReps` now returns `repId` for the formula; the user object has no `proId`, only `id`. `proId` in endpoint inputs (`assignLead`, `loadLeads`, `offboardPro`, …) is the record id and is unchanged.
+- **Why:** A role check that is only ever `=== 'Manager'` fails closed for free; the other three forms do not. One id per name removes a class of silent mismatches. Side effect: a Manager viewing as a Pro can now edit that Pro's activities in the UI (the server already allowed it for a Manager).
 
 ### Ownership checks must allow an echo of the existing value — 2026-11-11
 - **Context:** After the first ownership push, an offline trace of the Pro saves (real endpoint code, exact UI payloads, stubbed Airtable) found two false refusals. `ActivityForm` echoes back the activity's current credited rep, and `LeadForm` echoes only the first owner of a lead; both tripped checks written as "must equal the caller / must equal the stored list". 905 of ~19,800 live activities are credited to someone other than the lead's current owner, so a Pro editing one would have got a 403. The same audit found `updateSelfGenActivity` had no ownership check and `logAuditEvent` trusted a client-supplied email.

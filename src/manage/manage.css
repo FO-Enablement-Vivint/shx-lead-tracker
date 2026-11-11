@@ -31,7 +31,7 @@
      text (the same dark as the buttons) instead of the Lead Tracker's white. */
   --m-brand: hsl(145 50% 38%);
   --m-on-brand: hsl(150 40% 7%);
-  --m-danger: hsl(0 78% 68%);
+  --m-danger: hsl(var(--danger-soft));
   --m-danger-bg: hsl(0 40% 13%);
   --m-radius: 12px;
   --m-radius-sm: 8px;
@@ -40,7 +40,7 @@
   margin: 0;
   background: var(--m-bg);
   color: var(--m-text);
-  font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font: 14px/1.5 var(--font-sans), ui-sans-serif, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -297,7 +297,7 @@
 }
 
 .manage .btn-red {
-  --m-fill: hsl(350 75% 40%); --m-tone: hsl(350 90% 76%); --m-on-fill: #fff;
+  --m-fill: hsl(var(--danger-strong)); --m-tone: hsl(var(--danger-soft)); --m-on-fill: #fff;
 }
 
 
@@ -543,8 +543,8 @@
 .manage button.btn-quiet { background: transparent; color: var(--m-text); border: 1px solid var(--m-border-strong); }
 .manage button.btn-quiet:hover:not(:disabled) { background: var(--m-surface-2); }
 
-.manage button.btn-danger { background: hsl(0 70% 50%); color: #fff; }
-.manage button.btn-danger:hover:not(:disabled) { background: hsl(0 72% 56%); }
+.manage button.btn-danger { background: hsl(var(--danger-strong)); color: #fff; }
+.manage button.btn-danger:hover:not(:disabled) { background: hsl(var(--danger)); }
 
 .manage .tag-reverted {
   margin-left: 8px; padding: 1px 7px; border-radius: 999px; vertical-align: 1px;

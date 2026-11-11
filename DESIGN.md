@@ -94,13 +94,14 @@ as hex; keep it equal to Pro `--primary`.
 
 ## Known drift (not yet fixed)
 
-- `--header-muted` is `145 12% 55%` in Pro but `--m-header-muted` is `145 12% 62%` in the Manager View, with no comment saying whether that is intentional contrast.
-- `.dark` in `globals.css` mirrors the light values and no `ThemeProvider` exists, so there is no real theme switching.
-- The Admin page uses `window.confirm` instead of the dialog pattern above.
-- The Manager View's font depends on Inter loading from the Pro stylesheet's `@import`.
-- Several unrelated reds exist (`--destructive`, `--status-closed`, `--m-danger`, `.btn-danger`, `.btn-red`) with no single danger token.
+None recorded. Add items here as they are found.
 
 ## Decisions
+
+### One red, three shades; one font source; no dark theme; native confirm on Admin — 2026-11-11
+- **Context:** Five unrelated reds, a `.dark` block that mirrored the light values with no way to switch to it, Inter reaching the Manager View only through the Pro stylesheet's `@import`, a 7-point gap between the two `--header-muted` values, and `window.confirm` on the Admin page.
+- **Decision:** `globals.css` defines `--danger` (text, icons, borders on light), `--danger-strong` (solid fills carrying white text) and `--danger-soft` (text on dark); `--destructive`, `--status-closed`, `--m-danger`, `.btn-danger` and `.btn-red` point at them. Inter loads through `next/font` in `app/layout.tsx` as `--font-inter`, read via `--font-sans` by both views. `.dark` is deleted but `darkMode: ['class']` stays in Tailwind, because removing it would switch the `dark:` utilities in `packages/components` to the OS setting. `--header-muted` is 62% in both views. The Admin page keeps `window.confirm`.
+- **Why:** Contrast, not taste, is why there are three reds. `window.confirm` works on every device and the page is manager-only; a dialog would need a scoped component (shadcn dialogs portal outside `.manage` and would render light-themed). Revisit if Admin gains a second kind of action.
 
 ### The Manager View is a separate, scoped dark theme — 2026-11-11
 - **Context:** Managers need dense admin tables and dialogs that the Pro app's light shadcn theme does not suit, and both live in one Next.js app sharing one global stylesheet.

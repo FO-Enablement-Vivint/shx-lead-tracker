@@ -8,6 +8,7 @@ import MobileNav from './MobileNav';
 import ProxyIndicator from './ProxyIndicator';
 import { useProxy } from '../contexts/ProxyContext';
 import { useSession } from '@FO-Enablement-Vivint/magistrate/next';
+import { isManagerRole } from '@server/lib/roles';
 
 // The active tab lives in the URL hash (#tab=compensation) so a refresh, a
 // bookmark, or the back button lands on the same tab. This component only
@@ -26,7 +27,7 @@ export default function LeadsDashboard() {
 
   const [requestedTab, setRequestedTab] = useState(readTabFromHash);
   const { originalUser } = useProxy();
-  const isManager = originalUser?.role === 'Manager';
+  const isManager = isManagerRole(originalUser?.role);
 
   // Follow back/forward and manual edits to the hash.
   useEffect(() => {

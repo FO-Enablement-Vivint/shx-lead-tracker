@@ -14,6 +14,7 @@ import { uploadAttachment } from '@server/lib/airtable';
 import { SelfGenTime } from '@server/airtable/index';
 import { SelfGenTimeTable } from '@server/airtable/schema.generated';
 import { requireRosterUser } from '@server/lib/roster';
+import { isManager } from '@server/lib/access';
 import { getSession } from '@FO-Enablement-Vivint/magistrate/next';
 
 const MAX_BYTES = 4 * 1024 * 1024;
@@ -41,7 +42,7 @@ export const POST = async (request: NextRequest) => {
       throw new ApiError({ code: 'NOT_FOUND', message: 'Activity not found' });
     }
     const ownsRecord = (record.shxPro ?? []).includes(user.id);
-    if (!ownsRecord && user.role !== 'Manager') {
+    if (!ownsRecord && !isManager(user)) {
       throw new ApiError({ code: 'FORBIDDEN', message: 'You can only attach files to your own activities' });
     }
 
