@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { SelfGenTime } from '../airtable/index';
+import { requireSelfGenAccess } from '../lib/access';
 
 export default createEndpoint({
   description: 'Updates an existing Self-Gen Time activity record',
@@ -16,7 +17,10 @@ export default createEndpoint({
     keepAttachmentIds: z.array(z.string()).optional(),
   }),
   outputSchema: z.any(),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    // A Pro may edit only their own Self-Gen records; a Manager may edit any.
+    await requireSelfGenAccess(context.user, input.id);
+
     const record: Record<string, any> = {};
     if (input.dateOfActivity !== undefined) record.dateOfActivity = input.dateOfActivity;
     if (input.timeSlot !== undefined) record.timeSlot = input.timeSlot;

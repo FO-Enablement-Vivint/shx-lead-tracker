@@ -33,11 +33,11 @@ export default createEndpoint({
         throw new ApiError({ code: 'FORBIDDEN', message: 'That lead is not assigned to you.' });
       }
       if (input.assignedPro !== undefined) {
+        // The form echoes the owner back (only the first, on a co-assigned
+        // lead), and a Pro's write never stores it. Refuse only a rep who is
+        // not already on the lead.
         const current = ([] as string[]).concat((lead.assignedPro as string[] | string | undefined) ?? []);
-        const same =
-          current.length === input.assignedPro.length &&
-          input.assignedPro.every((id) => current.includes(id));
-        if (!same) {
+        if (!input.assignedPro.every((id) => current.includes(id))) {
           throw new ApiError({ code: 'FORBIDDEN', message: 'Only a manager can reassign a lead.' });
         }
       }

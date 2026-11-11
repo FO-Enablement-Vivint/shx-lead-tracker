@@ -9,7 +9,6 @@ import getActivities from './getActivities';
 import getClosedLeads from './getClosedLeads';
 import getCompensation from './getCompensation';
 import getLeads from './getLeads';
-import getLeadStats from './getLeadStats';
 import getMyProfile from './getMyProfile';
 import getReps from './getReps';
 import getRunningTotals from './getRunningTotals';
@@ -72,7 +71,6 @@ export const endpoints = {
   getClosedLeads,
   getCompensation,
   getLeads,
-  getLeadStats,
   getMyProfile,
   getReps,
   getRunningTotals,

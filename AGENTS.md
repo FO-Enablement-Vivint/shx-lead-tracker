@@ -23,6 +23,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - The Manager View's CSS (`src/manage/manage.css`) is scoped under `.manage` with `--m-*` variables; keep it from restyling the Pro app.
 - Any endpoint that takes a lead id, activity id or `assignedPro` from the request must check ownership with the helpers in `server/lib/access.ts` (a Pro sees only their own leads; a mismatch is a 403). The roster gate does not do this. Add a case to `scripts/check-authz.ts` and run `npm run authz:check`.
 - Local `.env` points at the live Airtable base — writes are real.
+- A Pro's forms submit manager-only fields back unchanged (e.g. `assignedPro`), so an ownership check must compare against the stored value and refuse only a *new* value; comparing to the caller 403s legitimate saves. See `resolveActivityPro` and `updateLead`.
 
 ## Architecture
 

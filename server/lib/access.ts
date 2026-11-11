@@ -12,7 +12,7 @@
  * Being on the roster answers neither, so endpoints that take a lead, an
  * activity or an `assignedPro` from the request must call these.
  */
-import { Activities, NisLeads } from '../airtable/index';
+import { Activities, NisLeads, SelfGenTime } from '../airtable/index';
 import { ApiError, type RequestUser } from './endpoint';
 
 export function isManager(user: RequestUser): boolean {
@@ -91,11 +91,37 @@ export async function requireActivityAccess(user: RequestUser, activityId: strin
 /**
  * A Pro may attribute an activity only to themselves (the Pro UI never sends
  * it); only a Manager may credit another rep. Returns the value to store.
+ *
+ * When editing, the form echoes back whoever the activity is already credited
+ * to (the picker is hidden from Pros, so they cannot change it). Passing that
+ * credit as `existing` lets the echo through while still refusing to add a
+ * rep who is not already on the record.
  */
-export function resolveActivityPro(user: RequestUser, requested: string[] | undefined): string[] | undefined {
+export function resolveActivityPro(
+  user: RequestUser,
+  requested: string[] | undefined,
+  existing?: unknown,
+): string[] | undefined {
   if (isManager(user) || requested === undefined) return requested;
-  if (requested.some((id) => id !== user.id)) {
+  const current = toIdList(existing);
+  if (requested.some((id) => id !== user.id && !current.includes(id))) {
     throw forbidden('You can only record activity as yourself.');
   }
   return requested;
+}
+
+/**
+ * Throws unless the caller may act on this Self-Gen Time record: a Manager
+ * always may; a Pro only if the record is linked to them. Returns the record.
+ */
+export async function requireSelfGenAccess(user: RequestUser, recordId: string) {
+  const record = await SelfGenTime.findOne({ id: recordId });
+  if (!record) {
+    throw new ApiError({ code: 'NOT_FOUND', message: 'Activity not found' });
+  }
+  if (isManager(user)) return record;
+  if (!toIdList(record.shxPro).includes(user.id)) {
+    throw forbidden('That activity is not yours.');
+  }
+  return record;
 }

@@ -74,7 +74,7 @@ Three layers, in order:
    act on any lead (the Manager View's "View as" relies on this). Run
    `npm run authz:check` after touching any of it.
 
-Because both route handlers call the roster gate, it covers all 34 endpoints
+Because both route handlers call the roster gate, it covers all 33 endpoints
 at once rather than each one remembering to ask. The ownership layer is the
 opposite: it is per-endpoint, so a new endpoint is open until it calls it.
 

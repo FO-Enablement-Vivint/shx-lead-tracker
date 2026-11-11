@@ -16,8 +16,8 @@ export default createEndpoint({
   }),
   outputSchema: z.any(),
   execute: async ({ input, context }) => {
-    await requireActivityAccess(context.user, input.activityId);
-    const assignedPro = resolveActivityPro(context.user, input.assignedPro);
+    const existing = await requireActivityAccess(context.user, input.activityId);
+    const assignedPro = resolveActivityPro(context.user, input.assignedPro, existing.assignedPro);
 
     await Activities.update({
       id: input.activityId,

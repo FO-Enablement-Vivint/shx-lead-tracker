@@ -69,13 +69,18 @@ Recorded so they are not mistaken for distinct concepts. None are fixed yet.
 - **Pro / Rep / User / SHX** all mean a roster member. The Exports and Self-Gen tables say "SHX Name", "SHX Email" and "SHX Pro"; the compensation UI says "All Users", "All Pros" and "Selected Rep".
 - **`proId` is two different ids.** Mutating endpoints take the Airtable record id, but `getReps` returns the Rep ID formula value as `proId`.
 - **"Active" means three things:** Lead Type `Active`, roster Status `Active`, and the Leads tab (NEW + IN-PROGRESS only).
-- **"Closed" means three things:** Lead Type `Closed`, a Status starting `CLOSED |`, and the "closed" stat that excludes sold leads.
+- **"Closed" means two things:** Lead Type `Closed` and a Status starting `CLOSED |`. (A third, the "closed" stat that excluded sold leads, lived only in `getLeadStats` and went when it was deleted.)
 - **Role checks are written two ways:** `role === 'Pro'` and `role !== 'Manager'`. A third role would be treated differently by each.
 - **Compensation vs Exports:** the UI says Compensation, the Airtable table is Exports.
 - **Activities has several names:** Activities, Notes/Interactions, Lead Interactions, # Interactions.
 - **Stale status literal:** the close-reason check exempts `'CLOSED | Sold'`, which does not exist, so every closed status currently requires a reason.
 
 ## Decisions
+
+### Ownership checks must allow an echo of the existing value — 2026-11-11
+- **Context:** After the first ownership push, an offline trace of the Pro saves (real endpoint code, exact UI payloads, stubbed Airtable) found two false refusals. `ActivityForm` echoes back the activity's current credited rep, and `LeadForm` echoes only the first owner of a lead; both tripped checks written as "must equal the caller / must equal the stored list". 905 of ~19,800 live activities are credited to someone other than the lead's current owner, so a Pro editing one would have got a 403. The same audit found `updateSelfGenActivity` had no ownership check and `logAuditEvent` trusted a client-supplied email.
+- **Decision:** `resolveActivityPro` takes the stored credit as `existing` and refuses only a rep who is not already on the record; `updateLead` refuses a Pro only when the submitted owner list contains someone not already assigned. `requireSelfGenAccess` guards `updateSelfGenActivity`. `logAuditEvent` attributes the row to `context.user` and ignores `userEmail`/`userName`. `getLeadStats` is deleted: nothing called it and it paged the whole table.
+- **Why:** The Pro UI hides manager-only fields but still submits them, so a rule that compares them to the caller breaks legitimate saves, while a rule that compares them to the stored value cannot grant anything new. `getRunningTotals` and `getCompensation` were audited and are sound (a Pro is forced to their own id server-side).
 
 ### Ownership is enforced per endpoint, and a mismatch is a 403 — 2026-11-11
 - **Context:** The roster gate only decides who may use the app. `getLeads`, `getClosedLeads`, `getLeadStats`, `updateLead` and the activity endpoints trusted a client-supplied `assignedPro` / lead id, so a signed-in Pro could read the whole table or edit and reassign any lead.

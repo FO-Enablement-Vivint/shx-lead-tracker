@@ -1,35 +1,30 @@
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
-import { ShxTeam, AuditLog } from '../airtable/index';
+import { AuditLog } from '../airtable/index';
 
 export default createEndpoint({
-  description: 'Logs an audit event by finding the user pro and creating an audit log entry with the action, details, and lead information',
+  description: 'Logs an audit event for the signed-in user. Who did it comes from the session, never from the request.',
   authenticated: true,
   inputSchema: z.object({
-    action: z.any(),
+    action: z.string().max(100),
     leadId: z.string().optional(),
-    details: z.string().optional(),
-    userName: z.string(),
-    userEmail: z.string(),
+    details: z.string().max(2000).optional(),
+    /** Still sent by the UI; ignored — the audit row is attributed to the caller. */
+    userName: z.string().optional(),
+    userEmail: z.string().optional(),
   }),
   outputSchema: z.any(),
-  execute: async ({ input }) => {
-    const findUserPro = await ShxTeam.findOne({
-      filters: { email: input.userEmail },
-    });
-
+  execute: async ({ input, context }) => {
     const processedDetails = input.details
       ? `${input.details}${input.leadId ? ` (Lead ID: ${input.leadId})` : ''}`
       : input.leadId
       ? `Lead ID: ${input.leadId}`
       : undefined;
 
-    const assignedPro = findUserPro?.id ? [findUserPro.id] : undefined;
-
     const createAuditLog = await AuditLog.create({
       record: {
         actions: input.action,
-        assignedPro,
+        assignedPro: [context.user.id],
         details: processedDetails,
       },
     });

@@ -8,13 +8,12 @@
  * calls a write endpoint, so even a broken rule cannot change data.
  */
 import 'dotenv/config';
-import { ShxTeam, NisLeads, Activities } from '../server/airtable/index';
+import { ShxTeam, NisLeads, Activities, SelfGenTime } from '../server/airtable/index';
 import { requireRosterUser } from '../server/lib/roster';
 import { ApiError, type RequestUser } from '../server/lib/endpoint';
-import { requireLeadAccess, requireActivityAccess, resolveActivityPro } from '../server/lib/access';
+import { requireLeadAccess, requireActivityAccess, requireSelfGenAccess, resolveActivityPro } from '../server/lib/access';
 import getLeads from '../server/api/getLeads';
 import getClosedLeads from '../server/api/getClosedLeads';
-import getLeadStats from '../server/api/getLeadStats';
 import getActivities from '../server/api/getActivities';
 
 let failures = 0;
@@ -60,15 +59,11 @@ async function main() {
   for (const [name, ep] of [
     ['getLeads', getLeads],
     ['getClosedLeads', getClosedLeads],
-    ['getLeadStats', getLeadStats],
   ] as const) {
     const call = (user: RequestUser, assignedPro?: string) =>
       (ep as any).execute({ input: { assignedPro, limit: 1 }, context: ctx(user) });
     await expect(`${name}: Pro asks for another Pro`, 'forbid', () => call(proA, proB.id));
     await expect(`${name}: Pro omits assignedPro (whole table)`, 'forbid', () => call(proA));
-    // getLeadStats counts by paging the whole table, so its allowed paths are
-    // too slow for a check script; the forbid cases above throw before any query.
-    if (name === 'getLeadStats') continue;
     await expect(`${name}: Pro asks for own`, 'allow', () => call(proA, proA.id));
     await expect(`${name}: Manager views as a Pro`, 'allow', () => call(mgr, proA.id));
     await expect(`${name}: Manager omits assignedPro`, 'allow', () => call(mgr));
@@ -118,6 +113,24 @@ async function main() {
   await expect('Pro credits nobody', 'allow', () => resolveActivityPro(proA, undefined));
   await expect('Pro credits another rep', 'forbid', () => resolveActivityPro(proA, [proB.id]));
   await expect('Manager credits another rep', 'allow', () => resolveActivityPro(mgr, [proB.id]));
+  await expect('Pro edit echoes the existing credit (another rep)', 'allow', () => resolveActivityPro(proA, [proB.id], [proB.id]));
+  await expect('Pro edit adds a rep not already credited', 'forbid', () => resolveActivityPro(proA, [proB.id], [proA.id]));
+
+  console.log('\nSelf-Gen access (updateSelfGenActivity)');
+  const sg = await SelfGenTime.findAll({ limit: 25 });
+  const sgRec = sg.records.find((r) => Array.isArray(r.shxPro) && r.shxPro.length > 0);
+  if (sgRec) {
+    const ownerId = (sgRec.shxPro as string[])[0];
+    const sgOwner = [proA, proB, mgr].find((u) => u.id === ownerId);
+    const sgOther = [proA, proB].find((u) => u.id !== ownerId);
+    if (sgOwner && sgOther) {
+      await expect('Pro on own Self-Gen record', 'allow', () => requireSelfGenAccess(sgOwner, sgRec.id));
+    }
+    if (sgOther) await expect('Pro on another Pro\'s Self-Gen record', 'forbid', () => requireSelfGenAccess(sgOther, sgRec.id));
+    await expect('Manager on any Self-Gen record', 'allow', () => requireSelfGenAccess(mgr, sgRec.id));
+  } else {
+    console.log('  skip  no Self-Gen record with a Pro in the first 25');
+  }
 
   console.log(failures ? `\n${failures} check(s) FAILED` : '\nAll checks passed');
   process.exit(failures ? 1 : 0);
