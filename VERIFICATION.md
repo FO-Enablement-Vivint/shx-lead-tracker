@@ -9,9 +9,10 @@ activities, reps, status options, admin stats, self-gen, compensation and the
 login report all returned correct data; input validation returned 400; unknown
 endpoints 404.
 
-**The app has no authentication.** Every request is served as `APP_USER_EMAIL`.
-Treat that as the top item on this list — nothing else here matters if the app
-is reachable by people who should not see the data.
+Sign-in is Magistrate, then the SHX Team roster gate, then per-endpoint
+ownership checks (`server/lib/access.ts`) — see *How access works* in
+`README.md`. `npm run auth:check` and `npm run authz:check` exercise the last
+two against the live roster without writing anything.
 
 Keep the `npm run dev` terminal visible while testing. Every Airtable error is
 logged there with the table, field and message.
@@ -37,12 +38,18 @@ logged there with the table, field and message.
   Verify a row actually lands: open the app in a fresh tab, then query the
   table (`npm run db:check`). Refreshing the page must NOT add a row.
 
-- [ ] **Who the app runs as.** Confirm `APP_USER_EMAIL` matches the SHX Team
-  row you expect, and that its Role gives the right tabs. Check all three
-  outcomes: a valid active row → dashboard; a row marked `Inactive` → Access
-  Denied; an email not in the table → Access Denied naming the config problem.
-  With a Pro row, confirm only that pro's leads, compensation and self-gen
-  entries appear and the manager-only tabs are hidden.
+- [ ] **Who you are signed in as.** Confirm your Magistrate email matches the
+  SHX Team row you expect, and that its Role gives the right tabs. Check all
+  three outcomes: a valid active row → dashboard; a row marked `Inactive` →
+  Access Denied; an email not in the table → Access Denied. With a Pro row,
+  confirm only that pro's leads, compensation and self-gen entries appear and
+  the manager-only tabs are hidden.
+
+- [ ] **A Pro's lead edits still save.** The lead form submits manager-only
+  fields unchanged; the server drops them for a Pro and only writes status,
+  close reason and notes. As a Pro, change a status, add a note and log an
+  activity on one of your leads, then confirm each saved. Also confirm a
+  Manager can still reassign a lead.
 
 ## 3. Worth a glance
 
@@ -63,16 +70,13 @@ logged there with the table, field and message.
 2. Leads tab: counts, filters, search, first-page order.
 3. Open a lead: add, edit, delete an activity; change status.
 4. Closed, Compensation and Self-Gen (no files) tabs.
-5. Sign out, sign in as a **Pro** email: confirm only that pro's leads,
-   compensation and self-gen entries appear, and manager-only tabs are hidden.
+5. Sign in as a **Pro** email (Magistrate has no logout, so use a private
+   window): confirm only that pro's leads, compensation and self-gen entries
+   appear, and manager-only tabs are hidden.
 6. Sign in as an Inactive email and a non-roster email: confirm both are blocked.
 
 ## 5. Still to decide before production (Vercel)
 
-- **Authentication.** Nothing should be deployed publicly until
-  `requestUser()` in `server/lib/session.ts` derives the user from a real
-  sign-in. Until then, keep the deployment behind Vercel's deployment
-  protection.
 - Vercel function timeouts: `getLeadCount` (unassigned) and manager
   `getLeadStats` page through 40k+ NIS Leads rows at 5 req/s. Confirmed
   2026-09-29: a manager-view `getLeadStats` call ran past 7 minutes locally, so

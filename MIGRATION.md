@@ -4,8 +4,8 @@ Two migrations happened. **Zite → standalone** (2026-09-28) replaced the hoste
 Zite runtime with our own code. **Vite/Express → Next.js** (2026-09-29)
 replaced the framework.
 
-Authentication was removed in the second migration and has not been replaced —
-see *Authentication* at the end.
+Authentication was removed in the second migration and later replaced with
+Magistrate sign-in plus a roster gate — see *Authentication* at the end.
 
 ## Zite → standalone
 
@@ -16,7 +16,7 @@ What was replaced and where the seams are.
 | `zitejs/backend` `createEndpoint`, `ZiteError` | `server/lib/endpoint.ts` (`createEndpoint`, `ApiError`; `ZiteError` alias kept) |
 | `zitejs/integrations` table clients + record types | `server/airtable/index.ts` + `schema.generated.ts` (generated from the live base) |
 | `zitejs/api` typed client | `src/lib/api.ts` (types inferred from `server/api`) |
-| `zitejs/auth` `useAuth`, `loginWithRedirect`, `logout` | nothing — the app has no sign-in (see below) |
+| `zitejs/auth` `useAuth`, `loginWithRedirect`, `logout` | Magistrate sign-in (see *Authentication*); there was a gap with none in between |
 | `zitejs/upload` `uploadFile` | `src/lib/upload.ts` + `app/api/upload/route.ts` (bytes go straight into the record's Airtable cell) |
 | `zitejs/db` (`zite.loginEvents`, `zite.sql`) | `server/lib/db.ts` — SQLite at first, now Neon Postgres |
 | `context.user` enrichment | unchanged: `server/lib/currentUser.ts` still copies the SHX Team row onto `context.user` |
@@ -48,7 +48,7 @@ Files moved out of `src/` because they only run on the server:
   history was never migrated, so counts start from the Neon switch.
 ## Vite/Express → Next.js
 
-Everything that held business logic moved unchanged: the 31 endpoint files,
+Everything that held business logic moved unchanged: the 31 endpoint files (34 today),
 the Airtable adapter and generated schema, the SHX Team roster and role gating,
 and the whole dashboard UI. What changed is the shell around them.
 
@@ -58,12 +58,12 @@ and the whole dashboard UI. What changed is the shell around them.
 | Express app (`server/app.ts`, `server/index.ts`, `api/index.ts`) | Route handlers under `app/api/` |
 | Express dispatcher for `POST /api/:name` | `app/api/[name]/route.ts` (same contract) |
 | `express.static` for `/uploads` | removed — attachments are no longer hosted by the app |
-| Home-grown email sign-in (`server/lib/auth.ts`, `src/components/LoginScreen.tsx`) | removed — no sign-in |
-| Signed session cookie (`server/lib/session.ts`) | `session.ts` now builds `context.user` from `APP_USER_EMAIL` |
+| Home-grown email sign-in (`server/lib/auth.ts`, `src/components/LoginScreen.tsx`) | removed at the time; Magistrate later replaced it |
+| Signed session cookie (`server/lib/session.ts`) | `session.ts` briefly built `context.user` from `APP_USER_EMAIL`; since removed — `server/lib/roster.ts` builds it now |
 | `vercel.json` rewrites to one Express function | none — Next on Vercel is zero-config |
 | React 18 | React 19 |
 
-Notes on the seams:
+Notes on the seams (as of this migration; superseded by *Authentication* below):
 
 - **`context.user` is unchanged in shape.** `APP_USER_EMAIL` supplies the
   email; `enrichCurrentUser` still copies the SHX Team row on top, so
@@ -89,18 +89,24 @@ it is kept so the endpoint files stay unchanged.
 
 ### Previously (removed)
 
-There is none. `requestUser()` in `server/lib/session.ts` returns a user built
-from `APP_USER_EMAIL`, so every request is served as that one person and anyone
-who reaches the server gets their access.
+For a period there was no sign-in. `requestUser()` in `server/lib/session.ts`
+returned a user built from `APP_USER_EMAIL`, so every request was served as that
+one person and anyone who reached the server got their access. `session.ts` and
+`APP_USER_EMAIL` are both gone; Magistrate supplies the email and
+`requireRosterUser` turns it into `context.user`. Authorization did not move —
+the SHX Team row still decides role and assigned leads.
 
-That function is the whole seam. Replace it so the email comes from whoever is
-signed in and throw `ApiError` `UNAUTHORIZED` otherwise; `requireUser()` is
-already async and both route handlers already call it. Authorization does not
-move — `enrichCurrentUser` keeps deriving role and assigned leads from the SHX
-Team row.
+Magistrate (`@FO-Enablement-Vivint/magistrate`, Field Pro Mobile Okta) requires
+Next.js and React 19, a GitHub token with `read:packages` to install, and
+authorization from the Enablement team. It ships no logout and its sessions are
+fixed at 8 hours.
 
-Magistrate (`@FO-Enablement-Vivint/magistrate`, Field Pro Mobile Okta) was
-wired up and then removed before it could be tested. If it comes back, note
-that it requires Next.js and React 19 (both already in place), a GitHub token
-with `read:packages` to install, and authorization from the Enablement team
-before sign-in works. It ships no logout and its sessions are fixed at 8 hours.
+### Ownership (added 2026-11-11)
+
+The roster gate decides who may use the app, not whose data they may ask for.
+Until this date `getLeads`, `getClosedLeads`, `getLeadStats`, `updateLead`,
+`getActivities`, `createActivity`, `updateActivity` and `deleteActivity` trusted
+the client: a signed-in Pro could read every lead, or edit and reassign any
+lead, by passing a different id or omitting `assignedPro`. They now go through
+the helpers in `server/lib/access.ts`. A mismatch is a 403, not a silent
+rewrite. `npm run authz:check` verifies it against the live roster.

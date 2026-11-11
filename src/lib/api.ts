@@ -44,8 +44,9 @@ export async function callEndpoint<N extends EndpointName>(name: N, input?: Inpu
     } catch {
       /* non-JSON error body */
     }
-    // The app has no sign-in, so a 401 means the server rejected the request
-    // outright. Surface it rather than bouncing through a login route.
+    // A 401/403 means the server rejected the request outright (no session,
+    // off the roster, or not your data). Surface it rather than bouncing
+    // through a login route; the caller decides what to show.
     throw new ApiClientError(res.status, code, message, issues);
   }
 

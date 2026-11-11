@@ -15,14 +15,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `npm run dev` — Next dev server on :3000 (needs `.env`; see `.env.example`)
 - `npm run typecheck` / `npm run build` — the quality gate
 - `npm run schema:generate` — regenerate `server/airtable/schema.generated.ts` from the live base
-- `npm run auth:check`, `npm run db:check` — roster-gate and login-log sanity scripts
+- `npm run auth:check`, `npm run authz:check`, `npm run db:check` — roster-gate, ownership (read-only) and login-log sanity scripts
 
 ## Conventions
 
 - New endpoints go in `server/api/<name>.ts` and must be registered in `server/api/index.ts`. Manager-only endpoints must also be added to `managerEndpoints` there.
 - The Manager View's CSS (`src/manage/manage.css`) is scoped under `.manage` with `--m-*` variables; keep it from restyling the Pro app.
+- Any endpoint that takes a lead id, activity id or `assignedPro` from the request must check ownership with the helpers in `server/lib/access.ts` (a Pro sees only their own leads; a mismatch is a 403). The roster gate does not do this. Add a case to `scripts/check-authz.ts` and run `npm run authz:check`.
 - Local `.env` points at the live Airtable base — writes are real.
 
 ## Architecture
 
-See `README.md` (layout, access model, Airtable layer) and `MIGRATION.md` (history, auth seam).
+See `README.md` (layout, access model, Airtable layer) and `MIGRATION.md` (history, auth and ownership).

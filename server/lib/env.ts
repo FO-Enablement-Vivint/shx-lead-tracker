@@ -11,8 +11,8 @@ export const isProd = process.env.NODE_ENV === 'production';
 export const isVercel = Boolean(process.env.VERCEL);
 
 /**
- * Server-side configuration. The app has no authentication yet; the current
- * user comes from APP_USER_EMAIL — see server/lib/session.ts.
+ * Server-side configuration. The signed-in user comes from Magistrate and is
+ * checked against the SHX Team roster — see server/lib/roster.ts.
  */
 export const env = {
   isProd,

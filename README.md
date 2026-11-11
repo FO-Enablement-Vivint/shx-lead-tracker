@@ -24,7 +24,8 @@ server/
   api/index.ts           registry — add new endpoints here
   airtable/              typed table clients + generated schema
   lib/airtable.ts        Airtable REST adapter
-  lib/session.ts         resolves the current user — where auth belongs
+  lib/roster.ts          SHX Team roster gate — builds context.user per request
+  lib/access.ts          role and ownership checks (requireManager, requireLeadAccess, …)
   lib/db.ts              Neon Postgres — the login-event log
 packages/components/     shared shadcn/ui components
 scripts/generate-airtable-schema.ts   regenerates the Airtable schema
@@ -33,14 +34,14 @@ scripts/generate-airtable-schema.ts   regenerates the Airtable schema
 ## Running it
 
 ```bash
-cp .env.example .env     # fill in AIRTABLE_API_KEY and APP_USER_EMAIL
+cp .env.example .env     # fill in the Airtable and Magistrate values
 npm install
 npm run dev              # http://localhost:3000
 ```
 
-`APP_USER_EMAIL` must match an email in the **SHX Team** table. That row's Role
-decides whether the manager-only tabs appear. If it matches nothing, the app
-shows an Access Denied screen naming the misconfiguration.
+You sign in through Magistrate. Your email must match a row in the **SHX Team**
+table, and that row's Role decides whether the manager-only tabs appear. If it
+matches nothing, the app shows an Access Denied screen.
 
 | Script | What it does |
 | --- | --- |
@@ -49,10 +50,12 @@ shows an Access Denied screen naming the misconfiguration.
 | `npm start` | Serves the production build |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run schema:generate` | Re-reads the base schema from Airtable |
+| `npm run auth:check` | Read-only: what the roster gate decides for sample emails |
+| `npm run authz:check` | Read-only: who may see and touch whose leads (needs real Manager and Pro rows) |
 
 ## How access works
 
-Two separate gates, in order:
+Three layers, in order:
 
 1. **Magistrate — who you are.** `SessionProvider` redirects anyone without a
    session to `/magistrate-auth`, which bounces through Field Pro Mobile and
@@ -62,9 +65,18 @@ Two separate gates, in order:
    passes through `requireRosterUser` in `server/lib/roster.ts`, which looks
    the session email up in the **SHX Team** table. No row, or a row marked
    `Inactive`, and the request is refused with 403 before the endpoint runs.
+3. **Role and ownership — which data is yours.** Being on the roster says
+   nothing about whose leads you may read or change. `server/lib/access.ts`
+   holds those rules and each endpoint that takes a lead, activity or
+   `assignedPro` from the request must call them. A Pro may only list, edit or
+   log activity on leads assigned to them, and may not reassign a lead or edit
+   its customer fields; asking for anyone else's data is a 403. A Manager may
+   act on any lead (the Manager View's "View as" relies on this). Run
+   `npm run authz:check` after touching any of it.
 
-Because both route handlers call it, the roster gate covers all 31 endpoints
-at once rather than each one remembering to ask. It also populates
+Because both route handlers call the roster gate, it covers all 34 endpoints
+at once rather than each one remembering to ask. The ownership layer is the
+opposite: it is per-endpoint, so a new endpoint is open until it calls it. It also populates
 `context.user` from the roster row, so `context.user.id` is the Airtable record
 id and `role` drives the manager/pro split exactly as before.
 
@@ -88,11 +100,10 @@ variables to set:
 | --- | --- |
 | `AIRTABLE_API_KEY` | token with `data.records:read` + `data.records:write` |
 | `AIRTABLE_BASE_ID` | `apphPJFvk2oPNeJK9` |
-| `APP_USER_EMAIL` | an email in the SHX Team table |
-
-**Do not deploy this publicly while `APP_USER_EMAIL` is the only thing
-identifying the user.** Until auth exists, keep it behind Vercel's deployment
-protection or run it locally.
+| `DATABASE_URL` | Neon connection string (set by the Neon integration) |
+| `MAGISTRATE_CLIENT_ID`, `MAGISTRATE_CLIENT_SECRET` | per-app Magistrate credentials |
+| `MAGISTRATE_SESSION_KEY` | per-app key that encrypts the session cookie |
+| `NPM_AUTH_TOKEN` | GitHub token with `read:packages`, to install the Magistrate package |
 
 Login history lives in Neon; the connection string arrives as `DATABASE_URL`
 from the Neon integration. Long paginating endpoints can exceed the

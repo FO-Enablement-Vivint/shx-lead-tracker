@@ -77,6 +77,11 @@ Recorded so they are not mistaken for distinct concepts. None are fixed yet.
 
 ## Decisions
 
+### Ownership is enforced per endpoint, and a mismatch is a 403 — 2026-11-11
+- **Context:** The roster gate only decides who may use the app. `getLeads`, `getClosedLeads`, `getLeadStats`, `updateLead` and the activity endpoints trusted a client-supplied `assignedPro` / lead id, so a signed-in Pro could read the whole table or edit and reassign any lead.
+- **Decision:** `server/lib/access.ts` holds the rules (`resolveAssignedPro`, `requireLeadAccess`, `requireActivityAccess`, `resolveActivityPro`). A Pro may only list, edit or log activity on leads assigned to them; a Manager may act on any. Asking for someone else's data is refused with 403 rather than quietly rewritten to the caller's own id. For `updateLead` a Pro's write is limited to status, close reason and lead details; the form submits the manager-only fields unchanged, so those are dropped, but an actual change of Assigned Pro is a 403.
+- **Why:** Silent coercion would hide misuse and mask client bugs, and the legitimate client never sends a mismatched id. Ownership is per-endpoint (unlike the roster gate), so a new endpoint taking a lead, activity or `assignedPro` is open until it calls these. `npm run authz:check` verifies it read-only against the live roster.
+
 ### Airtable stays the system of record, and its automations are part of the behavior — 2026-11-11
 - **Context:** The lead loaders are ports of Airtable button scripts, and Distribute, Process Uploads and Mark Leftovers only tick Control Panel checkboxes.
 - **Decision:** Keep business logic in step with the Airtable side rather than replacing it, and write lead changes in two phases when Assigned Pro changes.
