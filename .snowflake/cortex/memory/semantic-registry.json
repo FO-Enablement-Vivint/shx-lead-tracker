@@ -1,5 +1,53 @@
 {
   "bannedSynonyms": [],
-  "codeReferences": [],
-  "valueAgreement": []
+  "codeReferences": [
+    { "term": "Roster", "symbol": "requireRosterUser", "sourceDoc": "CONTEXT.md" },
+    { "term": "Manager", "symbol": "MANAGER_ONLY_ENDPOINTS", "sourceDoc": "CONTEXT.md" },
+    { "term": "Proxy", "symbol": "ProxyContext", "sourceDoc": "CONTEXT.md" },
+    { "term": "Rep", "symbol": "RepsContext", "sourceDoc": "CONTEXT.md" },
+    { "term": "Manager View", "symbol": "ManageShell", "sourceDoc": "CONTEXT.md" },
+    { "term": "brand mark", "symbol": "BRAND_GREEN", "sourceDoc": "DESIGN.md" }
+  ],
+  "valueAgreement": [
+    {
+      "name": "header-bg",
+      "sourceDoc": "DESIGN.md",
+      "files": [
+        { "path": "DESIGN.md", "pattern": "`--header-bg`\\s*\\|\\s*`(\\d+ \\d+% \\d+%)`" },
+        { "path": "app/globals.css", "pattern": "--header-bg:\\s*(\\d+ \\d+% \\d+%)" },
+        { "path": "DESIGN.md", "pattern": "`--m-header-bg`\\s*\\|\\s*`hsl\\((\\d+ \\d+% \\d+%)\\)`" },
+        { "path": "src/manage/manage.css", "pattern": "--m-header-bg:\\s*hsl\\((\\d+ \\d+% \\d+%)\\)" }
+      ]
+    },
+    {
+      "name": "header-border",
+      "sourceDoc": "DESIGN.md",
+      "files": [
+        { "path": "DESIGN.md", "pattern": "`--header-border`\\s*\\|\\s*`(\\d+ \\d+% \\d+%)`" },
+        { "path": "app/globals.css", "pattern": "--header-border:\\s*(\\d+ \\d+% \\d+%)" },
+        { "path": "DESIGN.md", "pattern": "`--m-header-border`\\s*\\|\\s*`hsl\\((\\d+ \\d+% \\d+%)\\)`" },
+        { "path": "src/manage/manage.css", "pattern": "--m-header-border:\\s*hsl\\((\\d+ \\d+% \\d+%)\\)" }
+      ]
+    },
+    {
+      "name": "header-text",
+      "sourceDoc": "DESIGN.md",
+      "files": [
+        { "path": "DESIGN.md", "pattern": "`--header-foreground`\\s*\\|\\s*`(\\d+ \\d+% \\d+%)`" },
+        { "path": "app/globals.css", "pattern": "--header-foreground:\\s*(\\d+ \\d+% \\d+%)" },
+        { "path": "DESIGN.md", "pattern": "`--m-header-text`\\s*\\|\\s*`hsl\\((\\d+ \\d+% \\d+%)\\)`" },
+        { "path": "src/manage/manage.css", "pattern": "--m-header-text:\\s*hsl\\((\\d+ \\d+% \\d+%)\\)" }
+      ]
+    },
+    {
+      "name": "brand-green",
+      "sourceDoc": "DESIGN.md",
+      "files": [
+        { "path": "DESIGN.md", "pattern": "`--primary`\\s*\\|\\s*`(\\d+ \\d+% \\d+%)`" },
+        { "path": "app/globals.css", "pattern": "--primary:\\s*(\\d+ \\d+% \\d+%)" },
+        { "path": "DESIGN.md", "pattern": "`--m-brand`\\s*\\|\\s*`hsl\\((\\d+ \\d+% \\d+%)\\)`" },
+        { "path": "src/manage/manage.css", "pattern": "--m-brand:\\s*hsl\\((\\d+ \\d+% \\d+%)\\)" }
+      ]
+    }
+  ]
 }
