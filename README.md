@@ -76,7 +76,9 @@ Three layers, in order:
 
 Because both route handlers call the roster gate, it covers all 34 endpoints
 at once rather than each one remembering to ask. The ownership layer is the
-opposite: it is per-endpoint, so a new endpoint is open until it calls it. It also populates
+opposite: it is per-endpoint, so a new endpoint is open until it calls it.
+
+The roster gate also populates
 `context.user` from the roster row, so `context.user.id` is the Airtable record
 id and `role` drives the manager/pro split exactly as before.
 
