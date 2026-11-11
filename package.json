@@ -13,6 +13,7 @@
     "db:check": "tsx scripts/check-login-log.ts",
     "auth:check": "tsx scripts/check-roster-gate.ts",
     "authz:check": "tsx scripts/check-authz.ts",
+    "authz:saves": "tsx scripts/check-pro-saves.ts",
     "zips:sync": "tsx --env-file=.env scripts/sync-zip-centroids.ts",
     "leads:undo": "tsx --env-file=.env scripts/undo-lead-load.ts"
   },

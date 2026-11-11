@@ -14,4 +14,3 @@
 
 ## Next Session
 - Browser smoke-test on the deployed site. As a **Pro** (private window; Magistrate has no logout): change a status, add a note, log an activity, edit an activity credited to another rep. As a **Manager**: reassign a lead, "View as" a Pro (picker lists Pros, not you; that Pro's own activities are now editable), and eyeball Admin/Team/Unassigned (red buttons, font).
-- The offline Pro-save trace (stubbed Airtable, real endpoints, exact UI payloads) lives only in git-ignored `.tmp/trace-pro-saves.mts`; promote it to `scripts/` if it should survive a fresh clone.
