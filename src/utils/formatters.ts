@@ -43,3 +43,17 @@ export const formatLastRefreshTime = (time: Date | null): string => {
     });
   }
 };
+
+/**
+ * Formats an Airtable date for display. A date-only value ("2026-11-11", or the
+ * same day at exactly UTC midnight) is a calendar day, not an instant: parsing
+ * it with `new Date(value)` reads it as UTC midnight and shows the previous day
+ * in the Americas. This builds it in local time so the day never moves.
+ * Real timestamps (and anything unparseable) fall through to the normal path.
+ */
+export function formatDate(value: string | undefined | null): string {
+  if (!value) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.0+)?Z)?$/.exec(value);
+  const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(value);
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+}

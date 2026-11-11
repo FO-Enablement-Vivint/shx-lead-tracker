@@ -9,7 +9,7 @@ import { ArrowUpDown, Edit, Phone, Mail, Calendar, User, ChevronLeft, ChevronRig
 import { GetLeadsOutputType, GetRepsOutputType } from '@/lib/api';
 import EmptyState from './EmptyState';
 import { getStatusColorWithHover } from '../utils/statusColors';
-import { formatLastRefreshTime, formatPhone, phoneHref } from '../utils/formatters';
+import { formatLastRefreshTime, formatPhone, phoneHref, formatDate } from '../utils/formatters';
 type Lead = GetLeadsOutputType['leads'][0];
 type Pro = GetRepsOutputType['pros'][0];
 interface LeadsTableProps {
@@ -171,7 +171,7 @@ export default function LeadsTable({
       return <div className="space-y-1">
             {row.original.lastInteractionDate && <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-3 w-3 text-muted-foreground" />
-                <span>{new Date(row.original.lastInteractionDate).toLocaleDateString()}</span>
+                <span>{formatDate(row.original.lastInteractionDate)}</span>
               </div>}
             {row.original.daysSinceLastInteraction !== undefined && (staleness ? <div className="flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3 text-[hsl(var(--status-progress-bg))]" />
@@ -293,7 +293,7 @@ export default function LeadsTable({
                       </div>}
                     {row.original.lastInteractionDate && <div className="flex items-center gap-2 text-sm">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        <span>{new Date(row.original.lastInteractionDate).toLocaleDateString()}</span>
+                        <span>{formatDate(row.original.lastInteractionDate)}</span>
                         {staleness ? <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${staleness.badge}`}>{staleness.label} ago</span> : row.original.daysSinceLastInteraction !== undefined ? <span className="text-xs text-muted-foreground">({row.original.daysSinceLastInteraction}d ago)</span> : null}
                       </div>}
                   </div>

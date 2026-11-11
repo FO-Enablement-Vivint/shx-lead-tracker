@@ -13,5 +13,6 @@
 - Pushing `main` triggers a Vercel deploy of `shx-lead-tracker.vercel.app`. `.snowflake/`, `docs/`, `CONTEXT.md`, `DESIGN.md` and `AGENTS.md` don't affect the build, but keep the build gate green before pushing.
 
 ## Next Session
-- Browser-verified on the live deploy (Manager session, read-only): Lead Tracker, Manager View Team/Unassigned/Admin render with Inter and the new reds; `getReps` returns `repId` and no `proId`. **Still unverified:** any Pro-identity save (needs a Pro Okta login; `npm run authz:saves` covers the logic offline), the View-as dropdown contents, and Admin's "Recalculate counts" (38,982 unassigned leads at 5 req/s vs Vercel's function timeout; a live write, so not clicked).
-- The browser tool inherits the user's Magistrate session; it can drive the Manager side but cannot sign in as a Pro.
+- Live check on 2026-11-11 (proxied as a Pro, Manager login on the server): edit form field restrictions, note, status, activity create/edit/delete all work; audit rows are attributed to the real caller. Test data was reverted; three test Audit Log rows remain. Still unverified: any save made with a real Pro identity (covered offline by `npm run authz:saves`) and Admin's "Recalculate counts" (38,982 unassigned leads vs Vercel's timeout; a live write, so not clicked).
+- Date-only fields were displayed a day early; fixed with `formatDate` in the working tree (see git log). Re-check an activity date and a lead's Assigned date on the deployed site.
+- The browser tool inherits the user's Magistrate session and can drive the Manager side and View-as (Radix selects open via a dispatched `pointerdown`), but cannot sign in as a Pro. Reloading the page clears the in-memory proxy.

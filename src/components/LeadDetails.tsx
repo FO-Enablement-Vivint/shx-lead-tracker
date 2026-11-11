@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { GetLeadsOutputType, GetRepsOutputType } from '@/lib/api';
 import { logAuditEvent } from '../utils/auditLogger';
 import { getStatusColorWithHover } from '../utils/statusColors';
-import { formatPhone, phoneHref } from '../utils/formatters';
+import { formatPhone, phoneHref, formatDate } from '../utils/formatters';
 import ActivityForm from './ActivityForm';
 import LeadForm from './LeadForm';
 import ActivityList from './ActivityList';
@@ -208,7 +208,7 @@ export default function LeadDetails({
                       {currentLead.assignedDate && (
                         <div className="flex items-center gap-2">
                           <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                          <span className="text-sm">Assigned {new Date(currentLead.assignedDate).toLocaleDateString()}</span>
+                          <span className="text-sm">Assigned {formatDate(currentLead.assignedDate)}</span>
                         </div>
                       )}
                     </CardContent>
@@ -235,7 +235,7 @@ export default function LeadDetails({
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span className="text-sm">{new Date(currentLead.lastInteractionDate).toLocaleDateString()}</span>
+                          <span className="text-sm">{formatDate(currentLead.lastInteractionDate)}</span>
                         </div>
                         {currentLead.daysSinceLastInteraction !== undefined && (
                           <Badge variant="outline">{currentLead.daysSinceLastInteraction} days ago</Badge>

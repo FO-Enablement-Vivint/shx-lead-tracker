@@ -8,6 +8,7 @@ import { MessageSquare, Phone, User, Calendar, Edit2, FileText, Trash2, RefreshC
 import { getActivities, deleteActivity, GetActivitiesOutputType, GetRepsOutputType } from '@/lib/api';
 import { toast } from 'sonner';
 import { isManagerRole } from '@server/lib/roles';
+import { formatDate } from '../utils/formatters';
 
 type Activity = GetActivitiesOutputType['activities'][0];
 type Pro = GetRepsOutputType['pros'][0];
@@ -169,7 +170,7 @@ export default function ActivityList({ leadId, pros, onEditActivity, onRefresh, 
                   {activity.date && (
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Calendar className="h-3 w-3" />
-                      {new Date(activity.date).toLocaleDateString()}
+                      {formatDate(activity.date)}
                     </div>
                   )}
                 </div>

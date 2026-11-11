@@ -25,6 +25,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Any endpoint that takes a lead id, activity id or `assignedPro` from the request must check ownership with the helpers in `server/lib/access.ts` (a Pro sees only their own leads; a mismatch is a 403). The roster gate does not do this. Add a case to `scripts/check-authz.ts` and run `npm run authz:check`, plus one to `scripts/check-pro-saves.ts` if a form sends the field.
 - Local `.env` points at the live Airtable base — writes are real.
 - Compare roles only through `server/lib/roles.ts` (`isManagerRole`/`isProRole`, or `isManager`/`isPro` in `access.ts`); never a bare `role === 'Manager'`. `proId` always means the Airtable record id; the Rep ID formula is `repId`.
+- Show an Airtable date field with `formatDate` (`src/utils/formatters.ts`), never `new Date(value).toLocaleDateString()`: a date-only `YYYY-MM-DD` parses as UTC midnight and displays a day early in the US. Timestamps (Exports `createdTime`, Self-Gen) are real instants and are fine either way.
 - A Pro's forms submit manager-only fields back unchanged (e.g. `assignedPro`), so an ownership check must compare against the stored value and refuse only a *new* value; comparing to the caller 403s legitimate saves. See `resolveActivityPro` and `updateLead`.
 
 ## Architecture
