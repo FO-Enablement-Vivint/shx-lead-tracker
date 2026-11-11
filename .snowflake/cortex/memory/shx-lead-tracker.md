@@ -5,7 +5,7 @@
 
 ## Gotchas
 - `authz:check` and anything paging NIS Leads is slow (Airtable throttled to 5 req/s; each call takes seconds, the full script ~3 min). Run it in the background and poll a file; a foreground run looks hung and gets cancelled.
-- `.env` (git-ignored) holds all local secrets; `preinstall` sources it as shell, so values containing `&` must stay single-quoted. Local `.env` writes to the **live** Airtable base. It still carries an unused `APP_USER_EMAIL`. No `AIRTABLE_API_KEY` locally, so `npm run schema:generate` fails; `schema.generated.ts` was edited by hand for `refreshCounts` (regenerate when a key is available).
+- `.env` (git-ignored) holds all local secrets; `preinstall` sources it as shell, so values containing `&` must stay single-quoted. Local `.env` writes to the **live** Airtable base. It still carries an unused `APP_USER_EMAIL`. `npm run schema:generate` doesn't load `.env` itself: run `(set -a; . ./.env; set +a; npm run schema:generate)`.
 - Vercel env vars for this project are all Sensitive/hidden: `vercel env pull` returns only `VERCEL_OIDC_TOKEN`. Get secrets from the owner, not Vercel. `NPM_AUTH_TOKEN` is shared across Magistrate apps; Magistrate client ID/secret/session key are per-app.
 - `AGENTS.md`'s Next.js block is rewritten by `next dev`; project sections live below its END marker only.
 - The semantic-registry checker greps the whole repo on word boundaries, so don't add `bannedSynonyms` for "rep" or "user" — existing code names (`getReps`, `RepsContext`) would fail the gate.
