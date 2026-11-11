@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from '../lib/endpoint';
 import { AuditLog } from '../airtable/index';
+import { requireLeadAccess } from '../lib/access';
 
 export default createEndpoint({
   description: 'Logs an audit event for the signed-in user. Who did it comes from the session, never from the request.',
@@ -15,6 +16,9 @@ export default createEndpoint({
   }),
   outputSchema: z.any(),
   execute: async ({ input, context }) => {
+    // An entry about a lead is only accepted from someone who may act on that lead.
+    if (input.leadId) await requireLeadAccess(context.user, input.leadId);
+
     const processedDetails = input.details
       ? `${input.details}${input.leadId ? ` (Lead ID: ${input.leadId})` : ''}`
       : input.leadId

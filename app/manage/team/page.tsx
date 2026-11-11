@@ -110,7 +110,7 @@ export default function TeamPage() {
               <th className="num">Today</th>
               <th className="num">Active cap</th>
               <th className="num">Daily cap</th>
-              <th className="actions-col">Actions</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -138,7 +138,7 @@ export default function TeamPage() {
                   <td data-label="Today" className={`num${!p.todaysLeads ? ' zero' : ''}`}>{p.todaysLeads ?? 0}</td>
                   <td data-label="Active cap" className="num">{p.activeCap ?? '—'}</td>
                   <td data-label="Daily cap" className="num">{p.dailyCap ?? '—'}</td>
-                  <td className="actions-col card-wide">
+                  <td className="card-wide">
                     <div className="actions">
                       {ACTIONS.map(action => (
                         <button

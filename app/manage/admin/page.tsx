@@ -91,7 +91,7 @@ export default function AdminPage() {
             <p className="muted" style={{ margin: 0 }}>{action.help}</p>
           </div>
           <span className="spacer" />
-          <button className="primary" onClick={() => run(action)} disabled={busy !== null}>
+          <button onClick={() => run(action)} disabled={busy !== null}>
             {busy === action.endpoint ? 'Starting…' : 'Run'}
           </button>
         </div>

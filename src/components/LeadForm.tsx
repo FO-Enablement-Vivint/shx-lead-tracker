@@ -65,9 +65,9 @@ export default function LeadForm({
     leadDetails: true // All users can edit lead details/notes
   };
 
-  // Check if status requires close reason (all CLOSED except "CLOSED | Sold")
+  // Check if status requires close reason (every CLOSED status)
   const requiresCloseReason = (status: string) => {
-    return status.startsWith('CLOSED') && status !== 'CLOSED | Sold';
+    return status.startsWith('CLOSED');
   };
 
   // Format status for display
@@ -163,7 +163,7 @@ export default function LeadForm({
     }));
   };
   const handleStatusChange = (newStatus: string) => {
-    // If changing to a CLOSED status (except "CLOSED | Sold"), check if we need close reason
+    // If changing to a CLOSED status, check if we need close reason
     if (requiresCloseReason(newStatus) && !requiresCloseReason(lead?.status || '')) {
       // Only prompt if we're changing FROM a non-closed status TO a closed status that requires reason
       setPendingStatus(newStatus);

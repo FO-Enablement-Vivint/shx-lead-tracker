@@ -77,11 +77,14 @@ logged there with the table, field and message.
 
 ## 5. Still to decide before production (Vercel)
 
-- Vercel function timeouts: `getLeadCount` (unassigned) pages through 40k+ NIS
-  Leads rows at 5 req/s. `getLeadStats` had the same problem (a manager-view
-  call ran past 7 minutes locally, 2026-09-29) and was deleted on 2026-11-11
-  because nothing called it. Read counts from Airtable rollups/Control Panel
-  or precompute on a cron.
+- Vercel function timeouts: `refreshAdminStats` pages through every "Ready to
+  Assign" lead at 5 req/s, and no route sets `maxDuration`, so it can exceed a
+  Vercel function timeout when that queue is large (not measured). `getAdminStats`
+  reads the cached Control Panel counts, so only the refresh is at risk. The
+  old `getLeadStats` had the same problem (a manager-view call ran past 7
+  minutes locally, 2026-09-29) and was deleted on 2026-11-11 because nothing
+  called it. Read counts from Airtable rollups/Control Panel or precompute on a
+  cron.
 - Import old `LoginEvents` rows into Neon if Zite can still export them.
 
 See also `MIGRATION.md` (what replaced what) and `README.md` (running and

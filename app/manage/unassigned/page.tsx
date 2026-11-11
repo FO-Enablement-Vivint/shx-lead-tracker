@@ -139,7 +139,7 @@ export default function UnassignedPage() {
                         <option value="">Choose a rep…</option>
                         {reps.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                       </select>
-                      <button className="primary" disabled={!choice[lead.id] || busyId === lead.id} onClick={() => assign(lead)}>
+                      <button disabled={!choice[lead.id] || busyId === lead.id} onClick={() => assign(lead)}>
                         {busyId === lead.id ? 'Assigning…' : 'Assign'}
                       </button>
                     </div>

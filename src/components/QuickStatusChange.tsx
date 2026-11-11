@@ -33,7 +33,7 @@ export default function QuickStatusChange({
   const [showCloseReasonDialog, setShowCloseReasonDialog] = useState(false);
 
   const requiresCloseReason = (status: string) => {
-    return status.startsWith('CLOSED') && status !== 'CLOSED | Sold';
+    return status.startsWith('CLOSED');
   };
 
   const formatStatusLabel = (status: string) => {

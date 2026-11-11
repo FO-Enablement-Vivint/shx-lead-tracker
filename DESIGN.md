@@ -95,11 +95,8 @@ as hex; keep it equal to Pro `--primary`.
 ## Known drift (not yet fixed)
 
 - `--header-muted` is `145 12% 55%` in Pro but `--m-header-muted` is `145 12% 62%` in the Manager View, with no comment saying whether that is intentional contrast.
-- `components.json` points shadcn at `src/index.css`, which does not exist; the real stylesheet is `app/globals.css`, so the shadcn CLI would likely misplace output.
 - `.dark` in `globals.css` mirrors the light values and no `ThemeProvider` exists, so there is no real theme switching.
-- Unused or dead CSS: `--chart-*`, `--sidebar-*`, `--font-serif/mono`, and the `.shadow-premium-lg`, `.btn-inactive`, `.tab-trigger`, `.gradient-primary`, `.gradient-subtle` utilities.
 - The Admin page uses `window.confirm` instead of the dialog pattern above.
-- `className="primary"` and `actions-col` in `/manage` pages have no matching CSS rule.
 - The Manager View's font depends on Inter loading from the Pro stylesheet's `@import`.
 - Several unrelated reds exist (`--destructive`, `--status-closed`, `--m-danger`, `.btn-danger`, `.btn-red`) with no single danger token.
 

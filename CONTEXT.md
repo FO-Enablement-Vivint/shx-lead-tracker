@@ -73,7 +73,6 @@ Recorded so they are not mistaken for distinct concepts. None are fixed yet.
 - **Role checks are written two ways:** `role === 'Pro'` and `role !== 'Manager'`. A third role would be treated differently by each.
 - **Compensation vs Exports:** the UI says Compensation, the Airtable table is Exports.
 - **Activities has several names:** Activities, Notes/Interactions, Lead Interactions, # Interactions.
-- **Stale status literal:** the close-reason check exempts `'CLOSED | Sold'`, which does not exist, so every closed status currently requires a reason.
 
 ## Decisions
 

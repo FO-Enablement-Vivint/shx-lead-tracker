@@ -6,9 +6,6 @@
 
 @layer base {
   :root {
-    /* Backfilled during migration to 2.0 */
-    --font-serif: ui-serif;
-
     /* Auto-restored theme variables */
     --shadow-2xs: 0 1px rgb(0 0 0 / 0.05);
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -46,13 +43,6 @@
     --header-muted: 145 12% 55%;
     --header-border: 150 25% 22%;
     
-    /* Chart colors */
-    --chart-1: 145 50% 38%;
-    --chart-2: 199 89% 48%;
-    --chart-3: 0 84% 60%;
-    --chart-4: 271 81% 56%;
-    --chart-5: 340 75% 55%;
-    
     /* Font families */
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'Courier New', monospace;
@@ -67,16 +57,6 @@
     --shadow-spread: 0px;
     --shadow-opacity: 0.07;
     --shadow-color: #000000;
-    
-    /* Sidebar colors */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 145 50% 38%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 94%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 220 13% 82%;
-    --sidebar-ring: 145 50% 38%;
     
     /* Status badge colors */
     --status-new: 217 91% 60%;
@@ -136,27 +116,12 @@
     --border: 220 13% 82%;
     --input: 220 13% 82%;
     --ring: 145 50% 38%;
-    --chart-1: 145 50% 38%;
-    --chart-2: 199 89% 48%;
-    --chart-3: 0 84% 60%;
-    --chart-4: 271 81% 56%;
-    --chart-5: 340 75% 55%;
     
     --header-bg: 150 35% 14%;
     --header-foreground: 145 20% 95%;
     --header-muted: 145 12% 55%;
     --header-border: 150 25% 22%;
     
-    /* Sidebar colors (dark mode) */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 145 50% 38%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 94%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 220 13% 82%;
-    --sidebar-ring: 145 50% 38%;
-
     --warning-bg: 38 92% 95%;
     --warning-border: 38 92% 75%;
     --warning-text: 38 80% 30%;
@@ -177,15 +142,6 @@
 }
 
 @layer utilities {
-  /* Custom gradient utilities using primary colors */
-  .gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(168, 100%, 48%) 50%, hsl(168, 100%, 35%) 100%);
-  }
-  
-  .gradient-subtle {
-    background: linear-gradient(135deg, hsl(168, 100%, 95%) 0%, hsl(190.1, 100%, 95%) 50%, hsl(359.6, 100%, 95%) 100%);
-  }
-  
   /* Premium shadow effect */
   .shadow-premium {
     box-shadow: 
@@ -193,12 +149,6 @@
       0 1px 2px -1px hsl(var(--foreground) / 0.04);
   }
 
-  .shadow-premium-lg {
-    box-shadow: 
-      0 4px 6px -1px hsl(var(--foreground) / 0.07),
-      0 2px 4px -2px hsl(var(--foreground) / 0.04);
-  }
-  
   /* Status badge utilities */
   .badge-status-new {
     @apply bg-[hsl(var(--status-new-bg))] text-[hsl(var(--status-new-foreground))] border-[hsl(var(--status-new))];
@@ -228,11 +178,6 @@
     @apply bg-[hsl(var(--status-default-bg))] text-[hsl(var(--status-default-foreground))] border-[hsl(var(--status-default))];
   }
   
-  /* Button inactive state using semantic tokens */
-  .btn-inactive {
-    @apply bg-muted text-muted-foreground hover:bg-muted/80;
-  }
-
   /* Horizontal scroll container for filter pills */
   .filter-scroll {
     @apply flex items-center gap-1.5 overflow-x-auto pb-1;
@@ -243,10 +188,4 @@
     display: none;
   }
 
-  /* Consistent tab trigger style */
-  .tab-trigger {
-    @apply flex items-center gap-1.5 flex-shrink-0 px-3 py-1.5 rounded-md text-sm font-medium transition-all whitespace-nowrap;
-    @apply data-[state=active]:bg-primary data-[state=active]:text-primary-foreground;
-    @apply data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-muted/60;
-  }
 }
